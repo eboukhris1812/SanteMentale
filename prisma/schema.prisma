@@ -1,0 +1,30 @@
+// This is your Prisma schema file
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Bilan {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  humeur    Float
+  anxiete   Float
+  sommeil   Float
+  estime    Float
+  stress    Float
+  trauma    Float
+  burnout   Float
+  critique  Float
+
+  IGDP      Float
+  niveau    String
+  dominante String?
+}

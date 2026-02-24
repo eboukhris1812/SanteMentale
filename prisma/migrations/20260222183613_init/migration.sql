@@ -1,0 +1,16 @@
+-- CreateTable
+CREATE TABLE "Bilan" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "humeur" DOUBLE PRECISION NOT NULL,
+    "anxiete" DOUBLE PRECISION NOT NULL,
+    "sommeil" DOUBLE PRECISION NOT NULL,
+    "estime" DOUBLE PRECISION NOT NULL,
+    "stress" DOUBLE PRECISION NOT NULL,
+    "trauma" DOUBLE PRECISION NOT NULL,
+    "IGDP" DOUBLE PRECISION NOT NULL,
+    "niveau" TEXT NOT NULL,
+    "dominante" TEXT,
+
+    CONSTRAINT "Bilan_pkey" PRIMARY KEY ("id")
+);
