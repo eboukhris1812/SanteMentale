@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 type Interpretation = {
@@ -41,18 +42,56 @@ type ApiResult = {
 };
 
 const titleMap: Record<QuestionnaireScore["questionnaireId"], string> = {
-  phq9: "PHQ-9 (depression)",
-  gad7: "GAD-7 (anxiete)",
+  phq9: "PHQ-9 (dépression)",
+  gad7: "GAD-7 (anxiété)",
   pcl5Short: "PCL-5 court (trauma)",
   miniToc: "Mini-TOC",
 };
 
 const dominantLabelMap: Record<ApiResult["dominantCategory"], string> = {
-  depression: "Depression",
-  anxiety: "Anxiete",
+  depression: "Dépression",
+  anxiety: "Anxiété",
   trauma: "Trauma",
   ocd: "TOC",
 };
+
+const orientationMap: Record<
+  ApiResult["dominantCategory"],
+  {
+    specificTestName: string;
+    specificTestHref: string;
+    troubleSheetHref: string;
+  }
+> = {
+  depression: {
+    specificTestName: "PHQ-9",
+    specificTestHref: "/tests/phq9",
+    troubleSheetHref: "/troubles/humeur",
+  },
+  anxiety: {
+    specificTestName: "GAD-7",
+    specificTestHref: "/tests/gad7",
+    troubleSheetHref: "/categories/troubles-anxieux",
+  },
+  trauma: {
+    specificTestName: "PCL-5 court",
+    specificTestHref: "/tests/pcl5-court",
+    troubleSheetHref: "/troubles/traumatisme",
+  },
+  ocd: {
+    specificTestName: "Mini-TOC",
+    specificTestHref: "/tests/mini-toc",
+    troubleSheetHref: "/troubles/obsessionnel-compulsif",
+  },
+};
+
+function withRecommendationParams(
+  href: string,
+  dominantCategory: ApiResult["dominantCategory"]
+): string {
+  const separator = href.includes("?") ? "&" : "?";
+  return `${href}${separator}source=bilan-global&recommended=1&dominant=${dominantCategory}`;
+}
 
 export default function Resultats() {
   const [result, setResult] = useState<ApiResult | null>(null);
@@ -75,7 +114,7 @@ export default function Resultats() {
 
       const rawPayload = localStorage.getItem("bilanPayload");
       if (!rawPayload) {
-        setError("Aucun questionnaire trouve. Recommence le bilan.");
+        setError("Aucun questionnaire trouvé. Recommence le bilan.");
         setLoading(false);
         return;
       }
@@ -101,9 +140,8 @@ export default function Resultats() {
       setResult(apiResult);
       setLoading(false);
     } catch (computeError) {
-      console.error("Erreur calcul resultat:", computeError);
-      const message =
-        computeError instanceof Error ? computeError.message : "Erreur inconnue";
+      console.error("Erreur calcul résultat:", computeError);
+      const message = computeError instanceof Error ? computeError.message : "Erreur inconnue";
       setError("Impossible de calculer le bilan actuellement.");
       setDetails(message);
       setLoading(false);
@@ -130,7 +168,7 @@ export default function Resultats() {
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow">
-        <h2 className="text-2xl font-bold mb-4">Bilan synthetique</h2>
+        <h2 className="text-2xl font-bold mb-4">Bilan synthétique</h2>
         <p className="text-gray-700">Calcul du bilan en cours...</p>
       </div>
     );
@@ -139,14 +177,14 @@ export default function Resultats() {
   if (error || !result) {
     return (
       <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow">
-        <h2 className="text-2xl font-bold mb-4">Bilan synthetique</h2>
-        <p className="text-red-700 mb-4">{error ?? "Aucun resultat disponible."}</p>
+        <h2 className="text-2xl font-bold mb-4">Bilan synthétique</h2>
+        <p className="text-red-700 mb-4">{error ?? "Aucun résultat disponible."}</p>
         {details && <p className="text-xs text-gray-600 mb-4">{details}</p>}
         <button
           onClick={() => void computeFromApi()}
           className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
         >
-          Reessayer
+          Réessayer
         </button>
       </div>
     );
@@ -155,20 +193,51 @@ export default function Resultats() {
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Bilan synthetique</h2>
+        <h2 className="text-2xl font-bold mb-2">Bilan synthétique</h2>
         <p className="text-gray-700">
-          Les scores ci-dessous sont calcules cote serveur via le moteur psychometrique.
+          Les scores ci-dessous sont calculés côté serveur via le moteur psychométrique.
         </p>
       </div>
 
       <div className="p-4 bg-blue-50 rounded-xl">
-        <p className="font-medium">Indice global normalise</p>
+        <p className="font-medium">Indice global normalisé</p>
         <p className="text-3xl font-bold">{(globalIndex * 100).toFixed(1)}%</p>
       </div>
 
       <div className="p-4 bg-gray-50 rounded-xl">
-        <p className="font-medium">Categorie dominante</p>
+        <p className="font-medium">Catégorie dominante</p>
         <p className="text-lg">{dominantLabelMap[result.dominantCategory]}</p>
+      </div>
+
+      <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+        <p className="font-semibold mb-1">Étape suivante recommandée</p>
+        <p className="text-sm text-gray-700 mb-3">
+          Continue avec un test ciblé ({orientationMap[result.dominantCategory].specificTestName})
+          ou consulte la fiche explicative associée.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href={withRecommendationParams(
+              orientationMap[result.dominantCategory].specificTestHref,
+              result.dominantCategory
+            )}
+            className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700"
+          >
+            Aller au test spécifique
+          </Link>
+          <Link
+            href={orientationMap[result.dominantCategory].troubleSheetHref}
+            className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-50"
+          >
+            Voir la fiche trouble
+          </Link>
+          <Link
+            href="/bilan-global"
+            className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-50"
+          >
+            Refaire le bilan
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-4">
@@ -178,7 +247,7 @@ export default function Resultats() {
             <p className="text-sm text-gray-700 mb-1">
               Score: {score.totalScore} / {score.maxScore}
             </p>
-            <p className="text-sm text-gray-700 mb-1">Interpretation: {score.interpretation.label}</p>
+            <p className="text-sm text-gray-700 mb-1">Interprétation clinique: {score.interpretation.label}</p>
             <p className="text-sm text-gray-700">{score.interpretation.clinicalMeaning}</p>
           </article>
         ))}
@@ -192,12 +261,12 @@ export default function Resultats() {
       )}
 
       <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 space-y-3">
-        <p className="font-semibold">Methodologie (conformite IB)</p>
+        <p className="font-semibold">Méthodologie (conformité IB)</p>
         <p>
           <span className="font-medium">Cadre:</span> {result.methodology.framework}
         </p>
         <p>
-          <span className="font-medium">Methode de score:</span> {result.methodology.scoringMethod}
+          <span className="font-medium">Méthode de score:</span> {result.methodology.scoringMethod}
         </p>
         <p>
           <span className="font-medium">Population cible:</span> {result.methodology.ageTarget}
@@ -211,7 +280,7 @@ export default function Resultats() {
           </ul>
         </div>
         <div>
-          <p className="font-medium mb-1">References:</p>
+          <p className="font-medium mb-1">Références:</p>
           <ul className="list-disc pl-5 space-y-1">
             {result.methodology.sources.map((source) => (
               <li key={source}>{source}</li>
@@ -223,7 +292,7 @@ export default function Resultats() {
       <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-900">
         <p className="font-semibold mb-1">Avertissement</p>
         <p>
-          Outil educatif: ce resultat ne remplace pas une evaluation clinique par un professionnel de sante.
+          Outil éducatif: ce résultat ne remplace pas une évaluation clinique par un professionnel de santé.
         </p>
         <p className="mt-1">{result.safety.emergencyDisclaimer}</p>
       </div>

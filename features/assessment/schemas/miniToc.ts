@@ -8,24 +8,24 @@ const thresholds: readonly Threshold[] = [
   {
     min: 0,
     max: 3,
-    label: "Low OCD symptom load",
+    label: "Charge TOC faible",
     severity: "minimal",
-    clinicalMeaning: "Below common OCI-4 screening cut-points.",
+    clinicalMeaning: "Sous les seuils de depistage OCI-4 couramment utilises.",
   },
   {
     min: 4,
     max: 5,
-    label: "Elevated OCD symptoms",
+    label: "Symptomes TOC eleves",
     severity: "mild",
-    clinicalMeaning: "At/above broad screening threshold (community-oriented).",
+    clinicalMeaning: "Au-dessus d'un seuil de depistage large (orientation communautaire).",
   },
   {
     min: 6,
     max: 16,
-    label: "Probable OCD - positive screen",
+    label: "TOC probable - depistage positif",
     severity: "positive-screen",
     clinicalMeaning:
-      "At/above stricter threshold used to distinguish OCD from anxiety controls.",
+      "Au-dessus d'un seuil plus specifique pour distinguer TOC et troubles anxieux.",
   },
 ];
 
@@ -35,7 +35,7 @@ function interpret(totalScore: number): InterpretationResult {
   );
 
   if (!match) {
-    throw new Error(`Mini-TOC (OCI-4) score out of range: ${totalScore}`);
+    throw new Error(`Score Mini-TOC (OCI-4) hors plage: ${totalScore}`);
   }
 
   return {
@@ -48,28 +48,27 @@ function interpret(totalScore: number): InterpretationResult {
 export const miniTocDefinition: QuestionnaireDefinition = {
   id: "miniToc",
   version: "1.0.0",
-  title: "Mini-TOC (OCI-4 proxy)",
+  title: "Mini-TOC (proxy OCI-4)",
   items: [
-    { id: "mini_toc_1", prompt: "Unwanted upsetting thoughts or images." },
-    { id: "mini_toc_2", prompt: "Repeated checking behaviors." },
-    { id: "mini_toc_3", prompt: "Excessive washing/cleaning rituals." },
-    { id: "mini_toc_4", prompt: "Need for order/symmetry causing distress." },
+    { id: "mini_toc_1", prompt: "Pensees intrusives et penibles." },
+    { id: "mini_toc_2", prompt: "Comportements repetes de verification." },
+    { id: "mini_toc_3", prompt: "Rituels repetitifs de lavage/nettoyage." },
+    { id: "mini_toc_4", prompt: "Besoin d'ordre/symetrie avec detresse." },
   ],
   scale: {
     min: 0,
     max: 4,
     anchors: {
-      0: "Not at all",
-      1: "A little",
-      2: "Moderately",
-      3: "A lot",
-      4: "Extremely",
+      0: "Pas du tout",
+      1: "Un peu",
+      2: "Moderement",
+      3: "Beaucoup",
+      4: "Extremement",
     },
   },
   scoringRules: {
     method: "sum",
     requiredItems: 4,
-    // OCI-4 short OCD screener thresholds from validation literature.
     source: "Abramovitch A et al. J Obsessive Compuls Relat Disord. 2021;31:100696.",
   },
   thresholds,

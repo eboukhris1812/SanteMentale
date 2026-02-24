@@ -21,7 +21,7 @@ export async function GET() {
       ok: true,
       endpoint: "/api/bilans",
       methods: ["GET", "POST"],
-      message: "Use POST with JSON body: { phq9, gad7, pcl5Short, miniToc }",
+      message: "Utilise POST avec un JSON: { phq9, gad7, pcl5Short, miniToc }",
       ibCompliance: {
         educationalPurposeOnly: true,
         noDiagnosis: true,
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { error: "Rate limit exceeded" },
+        { error: "Limite de requetes atteinte" },
         {
           status: 429,
           headers: {
@@ -85,30 +85,30 @@ export async function POST(request: Request) {
         },
         dominantCategory,
         methodology: {
-          framework: "Educational psychometric screening for IB academic project",
-          scoringMethod: "Simple sum scoring per questionnaire, server-side",
-          ageTarget: "Adolescents 14-18",
+          framework: "Depistage psychometrique educatif pour projet academique IB",
+          scoringMethod: "Somme simple des items par questionnaire, calculee cote serveur",
+          ageTarget: "Adolescents 14-18 ans",
           limitations: [
-            "Screening tool only: does not establish a clinical diagnosis.",
-            "Cut-points can vary by population, language, and setting.",
-            "PCL-5 short and OCI-4 style mini-TOC are indicative and not standalone diagnostics.",
+            "Outil de depistage uniquement: ne pose pas de diagnostic clinique.",
+            "Les seuils peuvent varier selon la population, la langue et le contexte.",
+            "PCL-5 court et Mini-TOC (style OCI-4) sont indicatifs et non diagnostiques seuls.",
           ],
           sources: [
             "PHQ-9: Kroenke K, Spitzer RL, Williams JBW. J Gen Intern Med. 2001;16(9):606-613.",
             "GAD-7: Spitzer RL, Kroenke K, Williams JBW, Lowe B. Arch Intern Med. 2006;166(10):1092-1097.",
-            "PCL-5 guidance (20-item): VA/NCPTSD; short-form thresholds vary by validation study.",
-            "OCI-4 short screener: Abramovitch A et al. J Obsessive Compuls Relat Disord. 2021;31:100696.",
+            "PCL-5 (20 items): recommandations VA/NCPTSD; seuils courts variables selon les etudes.",
+            "OCI-4 court: Abramovitch A et al. J Obsessive Compuls Relat Disord. 2021;31:100696.",
           ],
         },
         safety: {
           educationalPurposeOnly: true,
           emergencyDisclaimer:
-            "If there is immediate danger, contact local emergency services right now.",
+            "En cas de danger immediat, contacte sans attendre les services d'urgence locaux.",
           urgentSupportRecommended,
           urgentSupportReason:
             urgentSupportRecommended
-              ? "PHQ-9 item 9 is above 0, which warrants prompt follow-up with a qualified adult or professional."
-              : "No immediate critical flag detected on PHQ-9 item 9.",
+              ? "L'item 9 du PHQ-9 est superieur a 0: parle rapidement a un adulte de confiance ou a un professionnel de sante."
+              : "Aucun signal critique immediat detecte sur l'item 9 du PHQ-9.",
         },
       },
       {
@@ -123,14 +123,14 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof Error && "name" in error && error.name === "ZodError") {
       return NextResponse.json(
-        { error: "Invalid payload format" },
+        { error: "Format de donnees invalide" },
         { status: 400 }
       );
     }
 
     console.error("/api/bilans POST failed", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Erreur interne du serveur" },
       { status: 500 }
     );
   }

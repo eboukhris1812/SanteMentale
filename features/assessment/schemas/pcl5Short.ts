@@ -8,23 +8,23 @@ const thresholds: readonly Threshold[] = [
   {
     min: 0,
     max: 4,
-    label: "Low PTSD symptom load (short form)",
+    label: "Charge traumatique faible (forme courte)",
     severity: "minimal",
-    clinicalMeaning: "Below commonly used short-form screening thresholds.",
+    clinicalMeaning: "Sous les seuils de depistage habituellement utilises pour les formes courtes.",
   },
   {
     min: 5,
     max: 5,
-    label: "Borderline positive screen",
+    label: "Depistage limite",
     severity: "mild",
-    clinicalMeaning: "Borderline range in short-form studies; monitor context.",
+    clinicalMeaning: "Zone frontiere dans les etudes de validation courte; interpretation contextuelle necessaire.",
   },
   {
     min: 6,
     max: 16,
-    label: "Positive PTSD screen (short form)",
+    label: "Depistage positif PTSD (forme courte)",
     severity: "positive-screen",
-    clinicalMeaning: "At/above a validated short-form cut-point used in method papers.",
+    clinicalMeaning: "Au-dessus d'un seuil utilise dans la litterature de validation courte.",
   },
 ];
 
@@ -34,7 +34,7 @@ function interpret(totalScore: number): InterpretationResult {
   );
 
   if (!match) {
-    throw new Error(`PCL-5 short score out of range: ${totalScore}`);
+    throw new Error(`Score PCL-5 court hors plage: ${totalScore}`);
   }
 
   return {
@@ -47,42 +47,27 @@ function interpret(totalScore: number): InterpretationResult {
 export const pcl5ShortDefinition: QuestionnaireDefinition = {
   id: "pcl5Short",
   version: "1.0.0",
-  title: "PCL-5 Short Form (4-item)",
+  title: "PCL-5 Forme Courte (4 items)",
   items: [
-    {
-      id: "pcl5s_2",
-      prompt: "Repeated, disturbing dreams of the stressful experience.",
-    },
-    {
-      id: "pcl5s_4",
-      prompt: "Feeling very upset when reminded of the stressful experience.",
-    },
-    {
-      id: "pcl5s_13",
-      prompt: "Feeling distant or cut off from other people.",
-    },
-    {
-      id: "pcl5s_15",
-      prompt: "Trouble falling or staying asleep.",
-    },
+    { id: "pcl5s_2", prompt: "Reves repetes et penibles lies a l'evenement stressant." },
+    { id: "pcl5s_4", prompt: "Se sentir tres bouleverse(e) par des rappels de l'evenement." },
+    { id: "pcl5s_13", prompt: "Se sentir distant(e) ou coupe(e) des autres." },
+    { id: "pcl5s_15", prompt: "Difficultes pour s'endormir ou rester endormi(e)." },
   ],
   scale: {
     min: 0,
     max: 4,
     anchors: {
-      0: "Not at all",
-      1: "A little bit",
-      2: "Moderately",
-      3: "Quite a bit",
-      4: "Extremely",
+      0: "Pas du tout",
+      1: "Un peu",
+      2: "Moderement",
+      3: "Beaucoup",
+      4: "Extremement",
     },
   },
   scoringRules: {
     method: "sum",
     requiredItems: 4,
-    // There is no single universally official cut-point for all short forms.
-    // This implementation uses a published 4-item PCL-5 short form and a
-    // commonly cited cut-point (>=6) from short-form validation work.
     source:
       "Zuromski KL et al. J Affect Disord. 2021;291:1-8. Full PCL-5 guidance: VA/NCPTSD recommends 31-33 on 20-item form.",
   },

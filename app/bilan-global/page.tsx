@@ -15,149 +15,149 @@ const questions: readonly Question[] = [
   {
     id: "phq9_1",
     questionnaire: "phq9",
-    text: "Peu d'interet ou de plaisir a faire les choses.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "Peu d'intérêt ou de plaisir à faire les choses.",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "phq9_2",
     questionnaire: "phq9",
-    text: "Se sentir triste, deprime(e) ou sans espoir.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "Se sentir triste, déprimé(e) ou sans espoir.",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "phq9_3",
     questionnaire: "phq9",
-    text: "Difficultes de sommeil (endormissement, reveils, trop dormir).",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "Difficultés de sommeil (endormissement, réveils, trop dormir).",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "phq9_4",
     questionnaire: "phq9",
-    text: "Se sentir fatigue(e) ou avec peu d'energie.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "Se sentir fatigué(e) ou avec peu d'énergie.",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "phq9_5",
     questionnaire: "phq9",
-    text: "Problemes d'appetit (pas faim ou manger trop).",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "Problèmes d'appétit (pas faim ou manger trop).",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "phq9_6",
     questionnaire: "phq9",
     text: "Se sentir nul(le) ou coupable.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "phq9_7",
     questionnaire: "phq9",
-    text: "Difficulte a se concentrer (cours, lecture, devoirs).",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "Difficulté à se concentrer (cours, lecture, devoirs).",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "phq9_8",
     questionnaire: "phq9",
     text: "Lenteur inhabituelle ou agitation importante.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "phq9_9",
     questionnaire: "phq9",
-    text: "Pensees que la vie ne vaut pas la peine ou auto-agression.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "Pensées que la vie ne vaut pas la peine ou auto-agression.",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
 
   {
     id: "gad7_1",
     questionnaire: "gad7",
-    text: "Se sentir nerveux(se), anxieux(se) ou a bout.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "Se sentir nerveux(se), anxieux(se) ou à bout.",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "gad7_2",
     questionnaire: "gad7",
-    text: "Ne pas reussir a arreter de s'inquieter.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "Ne pas réussir à arrêter de s'inquiéter.",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "gad7_3",
     questionnaire: "gad7",
-    text: "S'inquieter trop pour differentes choses.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "S'inquiéter trop pour différentes choses.",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "gad7_4",
     questionnaire: "gad7",
-    text: "Avoir du mal a se detendre.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "Avoir du mal à se détendre.",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "gad7_5",
     questionnaire: "gad7",
-    text: "Etre tellement agite(e) qu'il est difficile de rester en place.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    text: "Être tellement agité(e) qu'il est difficile de rester en place.",
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "gad7_6",
     questionnaire: "gad7",
     text: "Devenir facilement irritable.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
   {
     id: "gad7_7",
     questionnaire: "gad7",
     text: "Avoir peur que quelque chose de grave arrive.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitie des jours", "Presque tous les jours"],
+    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
   },
 
   {
     id: "pcl5s_2",
     questionnaire: "pcl5Short",
-    text: "Reves repetes et penibles lies a un evenement stressant.",
-    choices: ["Pas du tout", "Un peu", "Moderement", "Beaucoup", "Extremement"],
+    text: "Rêves répétés et pénibles liés à un événement stressant.",
+    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
   },
   {
     id: "pcl5s_4",
     questionnaire: "pcl5Short",
-    text: "Se sentir tres bouleverse(e) quand quelque chose rappelle l'evenement.",
-    choices: ["Pas du tout", "Un peu", "Moderement", "Beaucoup", "Extremement"],
+    text: "Se sentir très bouleversé(e) quand quelque chose rappelle l'événement.",
+    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
   },
   {
     id: "pcl5s_13",
     questionnaire: "pcl5Short",
-    text: "Se sentir distant(e) ou coupe(e) des autres.",
-    choices: ["Pas du tout", "Un peu", "Moderement", "Beaucoup", "Extremement"],
+    text: "Se sentir distant(e) ou coupé(e) des autres.",
+    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
   },
   {
     id: "pcl5s_15",
     questionnaire: "pcl5Short",
-    text: "Difficultes de sommeil depuis l'evenement.",
-    choices: ["Pas du tout", "Un peu", "Moderement", "Beaucoup", "Extremement"],
+    text: "Difficultés de sommeil depuis l'événement.",
+    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
   },
 
   {
     id: "mini_toc_1",
     questionnaire: "miniToc",
-    text: "Pensees intrusives difficiles a controler.",
-    choices: ["Pas du tout", "Un peu", "Moderement", "Beaucoup", "Extremement"],
+    text: "Pensées intrusives difficiles à contrôler.",
+    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
   },
   {
     id: "mini_toc_2",
     questionnaire: "miniToc",
-    text: "Verifier plusieurs fois les memes choses.",
-    choices: ["Pas du tout", "Un peu", "Moderement", "Beaucoup", "Extremement"],
+    text: "Vérifier plusieurs fois les mêmes choses.",
+    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
   },
   {
     id: "mini_toc_3",
     questionnaire: "miniToc",
-    text: "Rituels de nettoyage/lavage repetitifs.",
-    choices: ["Pas du tout", "Un peu", "Moderement", "Beaucoup", "Extremement"],
+    text: "Rituels de nettoyage/lavage répétitifs.",
+    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
   },
   {
     id: "mini_toc_4",
     questionnaire: "miniToc",
-    text: "Besoin d'ordre/symetrie qui genere de la detresse.",
-    choices: ["Pas du tout", "Un peu", "Moderement", "Beaucoup", "Extremement"],
+    text: "Besoin d'ordre/symétrie qui génère de la détresse.",
+    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
   },
 ];
 
@@ -188,7 +188,7 @@ function buildPayload(answers: AnswersMap): BilanPayload {
   for (const question of questions) {
     const value = answers[question.id];
     if (typeof value !== "number") {
-      throw new Error(`Missing answer for ${question.id}`);
+      throw new Error(`Réponse manquante pour ${question.id}`);
     }
     grouped[question.questionnaire].push(value);
   }
@@ -196,7 +196,7 @@ function buildPayload(answers: AnswersMap): BilanPayload {
   for (const [questionnaire, expected] of Object.entries(totalByQuestionnaire)) {
     const current = grouped[questionnaire as QuestionnaireId].length;
     if (current !== expected) {
-      throw new Error(`Invalid payload length for ${questionnaire}: ${current}/${expected}`);
+      throw new Error(`Longueur invalide pour ${questionnaire}: ${current}/${expected}`);
     }
   }
 
@@ -230,7 +230,7 @@ export default function BilanGlobal() {
       localStorage.setItem("bilanPayload", JSON.stringify(payload));
       window.location.assign("/profil-resultat");
     } catch (submissionError) {
-      console.error("Erreur creation payload bilan:", submissionError);
+      console.error("Erreur de création du payload bilan:", submissionError);
     }
   };
 
@@ -240,26 +240,26 @@ export default function BilanGlobal() {
         <div>
           <h1 className="text-2xl font-bold mb-2">Avant de commencer le bilan</h1>
           <p className="text-gray-700">
-            Ce questionnaire est un outil educatif pour un projet academique IB. Il ne remplace pas
-            une evaluation clinique.
+            Ce questionnaire est un outil éducatif pour un projet académique IB. Il ne remplace pas
+            une évaluation clinique.
           </p>
         </div>
 
         <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 space-y-3">
-          <p className="font-semibold">Methodologie (conformite IB)</p>
+          <p className="font-semibold">Méthodologie (conformité IB)</p>
           <p>
-            <span className="font-medium">Cadre:</span> depistage psychometrique educatif (14-18 ans).
+            <span className="font-medium">Cadre:</span> dépistage psychométrique éducatif (14-18 ans).
           </p>
           <p>
-            <span className="font-medium">Methode:</span> score par somme des items pour PHQ-9, GAD-7,
+            <span className="font-medium">Méthode:</span> score par somme des items pour PHQ-9, GAD-7,
             PCL-5 court et Mini-TOC.
           </p>
           <div>
             <p className="font-medium mb-1">Limites scientifiques:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Ce resultat est indicatif et non diagnostique.</li>
-              <li>Les seuils peuvent varier selon l'age, la langue et le contexte.</li>
-              <li>Les versions courtes (PCL-5 court, Mini-TOC) servent au depistage initial.</li>
+              <li>Ce résultat est indicatif et non diagnostique.</li>
+              <li>Les seuils peuvent varier selon l'âge, la langue et le contexte.</li>
+              <li>Les versions courtes (PCL-5 court, Mini-TOC) servent au dépistage initial.</li>
             </ul>
           </div>
         </div>
@@ -267,10 +267,10 @@ export default function BilanGlobal() {
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-900 space-y-1">
           <p className="font-semibold">Avertissements importants</p>
           <p>
-            Si tu te sens en danger immediat, contacte tout de suite les services d'urgence de ton
+            Si tu te sens en danger immédiat, contacte tout de suite les services d'urgence de ton
             pays.
           </p>
-          <p>Parle aussi rapidement a un adulte de confiance ou a un professionnel de sante.</p>
+          <p>Parle aussi rapidement à un adulte de confiance ou à un professionnel de santé.</p>
         </div>
 
         <div className="flex justify-end">
