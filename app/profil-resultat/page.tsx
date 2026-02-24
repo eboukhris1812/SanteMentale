@@ -66,7 +66,7 @@ const orientationMap: Record<
   depression: {
     specificTestName: "PHQ-9",
     specificTestHref: "/tests/phq9",
-    troubleSheetHref: "/troubles/humeur",
+    troubleSheetHref: "/troubles/depression-majeure",
   },
   anxiety: {
     specificTestName: "GAD-7",
@@ -76,12 +76,12 @@ const orientationMap: Record<
   trauma: {
     specificTestName: "PCL-5 court",
     specificTestHref: "/tests/pcl5-court",
-    troubleSheetHref: "/troubles/traumatisme",
+    troubleSheetHref: "/troubles/tspt",
   },
   ocd: {
     specificTestName: "Mini-TOC",
     specificTestHref: "/tests/mini-toc",
-    troubleSheetHref: "/troubles/obsessionnel-compulsif",
+    troubleSheetHref: "/troubles/toc",
   },
 };
 
