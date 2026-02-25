@@ -25,7 +25,23 @@ type ApiResult = {
     pcl5Short: QuestionnaireScore;
     miniToc: QuestionnaireScore;
   };
-  dominantCategory: "depression" | "anxiety" | "trauma" | "ocd";
+  categoryScores: {
+    depression: number;
+    anxiety: number;
+    trauma: number;
+    ocd: number;
+    personality: number;
+    eating: number;
+    neurodevelopment: number;
+  };
+  dominantCategory:
+    | "depression"
+    | "anxiety"
+    | "trauma"
+    | "ocd"
+    | "personality"
+    | "eating"
+    | "neurodevelopment";
   methodology: {
     framework: string;
     scoringMethod: string;
@@ -53,6 +69,9 @@ const dominantLabelMap: Record<ApiResult["dominantCategory"], string> = {
   anxiety: "Anxiété",
   trauma: "Trauma",
   ocd: "TOC",
+  personality: "Personnalité",
+  eating: "Conduites alimentaires",
+  neurodevelopment: "Neurodéveloppement",
 };
 
 const orientationMap: Record<
@@ -82,6 +101,21 @@ const orientationMap: Record<
     specificTestName: "Mini-TOC",
     specificTestHref: "/tests/mini-toc",
     troubleSheetHref: "/troubles/toc",
+  },
+  personality: {
+    specificTestName: "PDQ-4+ (Groupe A) - à venir",
+    specificTestHref: "/tests/pdq4-groupe-a",
+    troubleSheetHref: "/categories/troubles-personnalite",
+  },
+  eating: {
+    specificTestName: "EAT-26 - à venir",
+    specificTestHref: "/tests/eat26",
+    troubleSheetHref: "/categories/troubles-conduites-alimentaires",
+  },
+  neurodevelopment: {
+    specificTestName: "ASRS v1.1 - à venir",
+    specificTestHref: "/tests/asrs-v11",
+    troubleSheetHref: "/categories/troubles-neurodeveloppementaux",
   },
 };
 
@@ -207,6 +241,18 @@ export default function Resultats() {
       <div className="p-4 bg-gray-50 rounded-xl">
         <p className="font-medium">Catégorie dominante</p>
         <p className="text-lg">{dominantLabelMap[result.dominantCategory]}</p>
+      </div>
+
+      <div className="rounded-xl border border-gray-200 bg-white p-4">
+        <p className="font-medium mb-2">Scores par catégorie</p>
+        <div className="grid gap-2 md:grid-cols-2">
+          {Object.entries(result.categoryScores).map(([key, value]) => (
+            <p key={key} className="text-sm text-gray-700">
+              {dominantLabelMap[key as ApiResult["dominantCategory"]]}:{" "}
+              <span className="font-semibold">{(value * 100).toFixed(1)}%</span>
+            </p>
+          ))}
+        </div>
       </div>
 
       <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">

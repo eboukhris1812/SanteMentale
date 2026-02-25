@@ -4,7 +4,22 @@ import { questionnaireRegistry } from "@/features/assessment/schemas";
 import { enforceRateLimit } from "@/lib/security/rateLimit";
 import { bilanPayloadSchema } from "@/lib/validation/bilan";
 
-type DominantCategory = "depression" | "anxiety" | "trauma" | "ocd";
+type DominantCategory =
+  | "depression"
+  | "anxiety"
+  | "trauma"
+  | "ocd"
+  | "personality"
+  | "eating"
+  | "neurodevelopment";
+
+function normalizeScreen(answers: number[], maxPerItem: number): number {
+  const maxScore = answers.length * maxPerItem;
+  if (maxScore === 0) {
+    return 0;
+  }
+  return answers.reduce((sum, value) => sum + value, 0) / maxScore;
+}
 
 function extractClientIp(request: Request): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
@@ -21,7 +36,8 @@ export async function GET() {
       ok: true,
       endpoint: "/api/bilans",
       methods: ["GET", "POST"],
-      message: "Utilise POST avec un JSON: { phq9, gad7, pcl5Short, miniToc }",
+      message:
+        "Utilise POST avec un JSON: { phq9, gad7, pcl5Short, miniToc, personalityScreen, eatingScreen, neurodevScreen }",
       ibCompliance: {
         educationalPurposeOnly: true,
         noDiagnosis: true,
@@ -60,12 +76,18 @@ export async function POST(request: Request) {
       payload.pcl5Short
     );
     const miniToc = scoreQuestionnaire(questionnaireRegistry.miniToc, payload.miniToc);
+    const personalityScreen = normalizeScreen(payload.personalityScreen, 3);
+    const eatingScreen = normalizeScreen(payload.eatingScreen, 3);
+    const neurodevScreen = normalizeScreen(payload.neurodevScreen, 3);
 
     const dominantMap: Record<DominantCategory, number> = {
       depression: phq9.normalizedScore,
       anxiety: gad7.normalizedScore,
       trauma: pcl5Short.normalizedScore,
       ocd: miniToc.normalizedScore,
+      personality: personalityScreen,
+      eating: eatingScreen,
+      neurodevelopment: neurodevScreen,
     };
 
     const dominantCategory = (Object.entries(dominantMap).sort(
@@ -83,15 +105,18 @@ export async function POST(request: Request) {
           pcl5Short,
           miniToc,
         },
+        categoryScores: dominantMap,
         dominantCategory,
         methodology: {
           framework: "Depistage psychometrique educatif pour projet academique IB",
-          scoringMethod: "Somme simple des items par questionnaire, calculee cote serveur",
+          scoringMethod:
+            "Somme simple des items calculee cote serveur (questionnaires valides + ecrans d'orientation categories).",
           ageTarget: "Adolescents 14-18 ans",
           limitations: [
             "Outil de depistage uniquement: ne pose pas de diagnostic clinique.",
             "Les seuils peuvent varier selon la population, la langue et le contexte.",
             "PCL-5 court et Mini-TOC (style OCI-4) sont indicatifs et non diagnostiques seuls.",
+            "Personnalite, conduites alimentaires et neurodeveloppement sont actuellement estimes par des ecrans d'orientation courts.",
           ],
           sources: [
             "PHQ-9: Kroenke K, Spitzer RL, Williams JBW. J Gen Intern Med. 2001;16(9):606-613.",

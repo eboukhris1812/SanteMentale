@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 
-type QuestionnaireId = "phq9" | "gad7" | "pcl5Short" | "miniToc";
+type QuestionnaireId =
+  | "phq9"
+  | "gad7"
+  | "pcl5Short"
+  | "miniToc"
+  | "personalityScreen"
+  | "eatingScreen"
+  | "neurodevScreen";
 
 type Question = {
   id: string;
@@ -11,154 +18,58 @@ type Question = {
   choices: readonly string[];
 };
 
+const scale03 = [
+  "Pas du tout",
+  "Plusieurs jours",
+  "Plus de la moitié des jours",
+  "Presque tous les jours",
+] as const;
+
+const scale04 = ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"] as const;
+
 const questions: readonly Question[] = [
-  {
-    id: "phq9_1",
-    questionnaire: "phq9",
-    text: "Peu d'intérêt ou de plaisir à faire les choses.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "phq9_2",
-    questionnaire: "phq9",
-    text: "Se sentir triste, déprimé(e) ou sans espoir.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "phq9_3",
-    questionnaire: "phq9",
-    text: "Difficultés de sommeil (endormissement, réveils, trop dormir).",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "phq9_4",
-    questionnaire: "phq9",
-    text: "Se sentir fatigué(e) ou avec peu d'énergie.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "phq9_5",
-    questionnaire: "phq9",
-    text: "Problèmes d'appétit (pas faim ou manger trop).",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "phq9_6",
-    questionnaire: "phq9",
-    text: "Se sentir nul(le) ou coupable.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "phq9_7",
-    questionnaire: "phq9",
-    text: "Difficulté à se concentrer (cours, lecture, devoirs).",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "phq9_8",
-    questionnaire: "phq9",
-    text: "Lenteur inhabituelle ou agitation importante.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "phq9_9",
-    questionnaire: "phq9",
-    text: "Pensées que la vie ne vaut pas la peine ou auto-agression.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
+  { id: "phq9_1", questionnaire: "phq9", text: "Peu d'intérêt ou de plaisir à faire les choses.", choices: scale03 },
+  { id: "phq9_2", questionnaire: "phq9", text: "Se sentir triste, déprimé(e) ou sans espoir.", choices: scale03 },
+  { id: "phq9_3", questionnaire: "phq9", text: "Difficultés de sommeil (endormissement, réveils, trop dormir).", choices: scale03 },
+  { id: "phq9_4", questionnaire: "phq9", text: "Se sentir fatigué(e) ou avec peu d'énergie.", choices: scale03 },
+  { id: "phq9_5", questionnaire: "phq9", text: "Problèmes d'appétit (pas faim ou manger trop).", choices: scale03 },
+  { id: "phq9_6", questionnaire: "phq9", text: "Se sentir nul(le) ou coupable.", choices: scale03 },
+  { id: "phq9_7", questionnaire: "phq9", text: "Difficulté à se concentrer (cours, lecture, devoirs).", choices: scale03 },
+  { id: "phq9_8", questionnaire: "phq9", text: "Lenteur inhabituelle ou agitation importante.", choices: scale03 },
+  { id: "phq9_9", questionnaire: "phq9", text: "Pensées que la vie ne vaut pas la peine ou auto-agression.", choices: scale03 },
 
-  {
-    id: "gad7_1",
-    questionnaire: "gad7",
-    text: "Se sentir nerveux(se), anxieux(se) ou à bout.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "gad7_2",
-    questionnaire: "gad7",
-    text: "Ne pas réussir à arrêter de s'inquiéter.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "gad7_3",
-    questionnaire: "gad7",
-    text: "S'inquiéter trop pour différentes choses.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "gad7_4",
-    questionnaire: "gad7",
-    text: "Avoir du mal à se détendre.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "gad7_5",
-    questionnaire: "gad7",
-    text: "Être tellement agité(e) qu'il est difficile de rester en place.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "gad7_6",
-    questionnaire: "gad7",
-    text: "Devenir facilement irritable.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
-  {
-    id: "gad7_7",
-    questionnaire: "gad7",
-    text: "Avoir peur que quelque chose de grave arrive.",
-    choices: ["Pas du tout", "Plusieurs jours", "Plus de la moitié des jours", "Presque tous les jours"],
-  },
+  { id: "gad7_1", questionnaire: "gad7", text: "Se sentir nerveux(se), anxieux(se) ou à bout.", choices: scale03 },
+  { id: "gad7_2", questionnaire: "gad7", text: "Ne pas réussir à arrêter de s'inquiéter.", choices: scale03 },
+  { id: "gad7_3", questionnaire: "gad7", text: "S'inquiéter trop pour différentes choses.", choices: scale03 },
+  { id: "gad7_4", questionnaire: "gad7", text: "Avoir du mal à se détendre.", choices: scale03 },
+  { id: "gad7_5", questionnaire: "gad7", text: "Être tellement agité(e) qu'il est difficile de rester en place.", choices: scale03 },
+  { id: "gad7_6", questionnaire: "gad7", text: "Devenir facilement irritable.", choices: scale03 },
+  { id: "gad7_7", questionnaire: "gad7", text: "Avoir peur que quelque chose de grave arrive.", choices: scale03 },
 
-  {
-    id: "pcl5s_2",
-    questionnaire: "pcl5Short",
-    text: "Rêves répétés et pénibles liés à un événement stressant.",
-    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
-  },
-  {
-    id: "pcl5s_4",
-    questionnaire: "pcl5Short",
-    text: "Se sentir très bouleversé(e) quand quelque chose rappelle l'événement.",
-    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
-  },
-  {
-    id: "pcl5s_13",
-    questionnaire: "pcl5Short",
-    text: "Se sentir distant(e) ou coupé(e) des autres.",
-    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
-  },
-  {
-    id: "pcl5s_15",
-    questionnaire: "pcl5Short",
-    text: "Difficultés de sommeil depuis l'événement.",
-    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
-  },
+  { id: "pcl5s_2", questionnaire: "pcl5Short", text: "Rêves répétés et pénibles liés à un événement stressant.", choices: scale04 },
+  { id: "pcl5s_4", questionnaire: "pcl5Short", text: "Se sentir très bouleversé(e) quand quelque chose rappelle l'événement.", choices: scale04 },
+  { id: "pcl5s_13", questionnaire: "pcl5Short", text: "Se sentir distant(e) ou coupé(e) des autres.", choices: scale04 },
+  { id: "pcl5s_15", questionnaire: "pcl5Short", text: "Difficultés de sommeil depuis l'événement.", choices: scale04 },
 
-  {
-    id: "mini_toc_1",
-    questionnaire: "miniToc",
-    text: "Pensées intrusives difficiles à contrôler.",
-    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
-  },
-  {
-    id: "mini_toc_2",
-    questionnaire: "miniToc",
-    text: "Vérifier plusieurs fois les mêmes choses.",
-    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
-  },
-  {
-    id: "mini_toc_3",
-    questionnaire: "miniToc",
-    text: "Rituels de nettoyage/lavage répétitifs.",
-    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
-  },
-  {
-    id: "mini_toc_4",
-    questionnaire: "miniToc",
-    text: "Besoin d'ordre/symétrie qui génère de la détresse.",
-    choices: ["Pas du tout", "Un peu", "Modérément", "Beaucoup", "Extrêmement"],
-  },
+  { id: "mini_toc_1", questionnaire: "miniToc", text: "Pensées intrusives difficiles à contrôler.", choices: scale04 },
+  { id: "mini_toc_2", questionnaire: "miniToc", text: "Vérifier plusieurs fois les mêmes choses.", choices: scale04 },
+  { id: "mini_toc_3", questionnaire: "miniToc", text: "Rituels de nettoyage/lavage répétitifs.", choices: scale04 },
+  { id: "mini_toc_4", questionnaire: "miniToc", text: "Besoin d'ordre/symétrie qui génère de la détresse.", choices: scale04 },
+
+  { id: "pers_1", questionnaire: "personalityScreen", text: "Tu te méfies souvent des intentions des autres, même sans preuve claire.", choices: scale03 },
+  { id: "pers_2", questionnaire: "personalityScreen", text: "Tes émotions deviennent parfois très intenses et difficiles à réguler.", choices: scale03 },
+  { id: "pers_3", questionnaire: "personalityScreen", text: "Tu as des difficultés répétées à maintenir des relations stables.", choices: scale03 },
+  { id: "pers_4", questionnaire: "personalityScreen", text: "La peur du rejet ou de l'abandon influence fortement tes réactions.", choices: scale03 },
+
+  { id: "eat_1", questionnaire: "eatingScreen", text: "Tu es très préoccupé(e) par ton poids, ta silhouette ou ton image corporelle.", choices: scale03 },
+  { id: "eat_2", questionnaire: "eatingScreen", text: "Tu limites fortement ton alimentation ou compenses après avoir mangé.", choices: scale03 },
+  { id: "eat_3", questionnaire: "eatingScreen", text: "Il t'arrive de perdre le contrôle sur la quantité de nourriture.", choices: scale03 },
+  { id: "eat_4", questionnaire: "eatingScreen", text: "Tu ressens souvent de la culpabilité ou de la honte liée à l'alimentation.", choices: scale03 },
+
+  { id: "neuro_1", questionnaire: "neurodevScreen", text: "Tu as des difficultés persistantes d'attention dans les tâches quotidiennes.", choices: scale03 },
+  { id: "neuro_2", questionnaire: "neurodevScreen", text: "Tu te sens souvent agité(e), impulsif(ve) ou difficile à canaliser.", choices: scale03 },
+  { id: "neuro_3", questionnaire: "neurodevScreen", text: "Les interactions sociales te semblent souvent difficiles à décoder ou gérer.", choices: scale03 },
+  { id: "neuro_4", questionnaire: "neurodevScreen", text: "Tu présentes des mouvements/sons répétitifs difficiles à inhiber.", choices: scale03 },
 ];
 
 const totalByQuestionnaire: Record<QuestionnaireId, number> = {
@@ -166,6 +77,9 @@ const totalByQuestionnaire: Record<QuestionnaireId, number> = {
   gad7: 7,
   pcl5Short: 4,
   miniToc: 4,
+  personalityScreen: 4,
+  eatingScreen: 4,
+  neurodevScreen: 4,
 };
 
 type AnswersMap = Record<string, number>;
@@ -175,6 +89,9 @@ type BilanPayload = {
   gad7: number[];
   pcl5Short: number[];
   miniToc: number[];
+  personalityScreen: number[];
+  eatingScreen: number[];
+  neurodevScreen: number[];
 };
 
 function buildPayload(answers: AnswersMap): BilanPayload {
@@ -183,6 +100,9 @@ function buildPayload(answers: AnswersMap): BilanPayload {
     gad7: [],
     pcl5Short: [],
     miniToc: [],
+    personalityScreen: [],
+    eatingScreen: [],
+    neurodevScreen: [],
   };
 
   for (const question of questions) {
@@ -240,8 +160,8 @@ export default function BilanGlobal() {
         <div>
           <h1 className="text-2xl font-bold mb-2">Avant de commencer le bilan</h1>
           <p className="text-gray-700">
-            Ce questionnaire est un outil éducatif pour un projet académique IB. Il ne remplace pas
-            une évaluation clinique.
+            Ce questionnaire couvre l'ensemble des catégories de troubles du site (anxieux, humeur,
+            traumatisme/stress, personnalité, conduites alimentaires, neurodéveloppementaux).
           </p>
         </div>
 
@@ -251,25 +171,22 @@ export default function BilanGlobal() {
             <span className="font-medium">Cadre:</span> dépistage psychométrique éducatif (14-18 ans).
           </p>
           <p>
-            <span className="font-medium">Méthode:</span> score par somme des items pour PHQ-9, GAD-7,
-            PCL-5 court et Mini-TOC.
+            <span className="font-medium">Méthode:</span> somme des items (questionnaires validés +
+            écrans d'orientation complémentaires par catégorie).
           </p>
           <div>
             <p className="font-medium mb-1">Limites scientifiques:</p>
             <ul className="list-disc pl-5 space-y-1">
               <li>Ce résultat est indicatif et non diagnostique.</li>
-              <li>Les seuils peuvent varier selon l'âge, la langue et le contexte.</li>
-              <li>Les versions courtes (PCL-5 court, Mini-TOC) servent au dépistage initial.</li>
+              <li>Certaines catégories sont actuellement estimées par des écrans d'orientation courts.</li>
+              <li>Une évaluation clinique reste nécessaire en cas de retentissement important.</li>
             </ul>
           </div>
         </div>
 
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-900 space-y-1">
           <p className="font-semibold">Avertissements importants</p>
-          <p>
-            Si tu te sens en danger immédiat, contacte tout de suite les services d'urgence de ton
-            pays.
-          </p>
+          <p>Si tu te sens en danger immédiat, contacte tout de suite les services d'urgence de ton pays.</p>
           <p>Parle aussi rapidement à un adulte de confiance ou à un professionnel de santé.</p>
         </div>
 

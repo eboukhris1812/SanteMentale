@@ -13,8 +13,13 @@ export function generateStaticParams() {
   return unique.map((slug) => ({ slug }));
 }
 
-export default function PlannedTestPage({ params }: { params: { slug: string } }) {
-  const trouble = getTroubleByTestSlug(params.slug);
+export default async function PlannedTestPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const trouble = getTroubleByTestSlug(slug);
   if (!trouble || !trouble.test) {
     notFound();
   }
