@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import type { QuestionnaireScore } from "@/features/assessment/engine";
 import { questionnaireRegistry } from "@/features/assessment/schemas";
 
-type QuestionnaireId = "phq9" | "gad7" | "pcl5Short" | "miniToc";
+type QuestionnaireId = keyof typeof questionnaireRegistry;
 
 type SpecificTestApiResponse = {
   testId: QuestionnaireId;
@@ -67,7 +67,7 @@ export default function SpecificTestRunner({
       const orderedAnswers = definition.items.map((_, index) => {
         const value = nextAnswers[index];
         if (typeof value !== "number") {
-          throw new Error("Reponse manquante.");
+          throw new Error("Réponse manquante.");
         }
         return value;
       });
@@ -91,7 +91,7 @@ export default function SpecificTestRunner({
       setError(
         submitError instanceof Error
           ? submitError.message
-          : "Impossible de calculer le resultat."
+          : "Impossible de calculer le résultat."
       );
     }
   };
@@ -127,8 +127,8 @@ export default function SpecificTestRunner({
         <p className="text-gray-700">{description}</p>
         {isRecommendedFlow && (
           <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-sm text-indigo-900">
-            Test recommande depuis le bilan global
-            {dominant ? ` (dominante detectee: ${dominant}).` : "."}
+            Test recommandé depuis le bilan global
+            {dominant ? ` (dominante détectée : ${dominant}).` : "."}
           </div>
         )}
 
@@ -140,7 +140,7 @@ export default function SpecificTestRunner({
         </div>
 
         <div className="p-4 border rounded-xl">
-          <p className="font-medium mb-1">Interpretation</p>
+          <p className="font-medium mb-1">Interprétation</p>
           <p className="text-sm text-gray-700 mb-1">{result.score.interpretation.label}</p>
           <p className="text-sm text-gray-700">{result.score.interpretation.clinicalMeaning}</p>
         </div>
@@ -153,9 +153,9 @@ export default function SpecificTestRunner({
         )}
 
         <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800">
-          <p className="font-semibold mb-1">Methodologie</p>
+          <p className="font-semibold mb-1">Méthodologie</p>
           <p>{result.methodology.framework}</p>
-          <p className="mt-1">Reference scientifique: {result.methodology.source}</p>
+          <p className="mt-1">Référence scientifique : {result.methodology.source}</p>
         </div>
 
         <div>
@@ -182,8 +182,8 @@ export default function SpecificTestRunner({
       <p className="text-gray-700">{description}</p>
       {isRecommendedFlow && (
         <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-sm text-indigo-900">
-          Test recommande depuis le bilan global
-          {dominant ? ` (dominante detectee: ${dominant}).` : "."}
+          Test recommandé depuis le bilan global
+          {dominant ? ` (dominante détectée : ${dominant}).` : "."}
         </div>
       )}
 

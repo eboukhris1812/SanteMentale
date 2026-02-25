@@ -20,8 +20,8 @@ export default async function TestPcl5CourtPage({
 
   return (
     <SpecificTestRunner
-      title="Test specifique: PCL-5 court"
-      description="Evaluation orientee trauma (outil educatif, non diagnostique)."
+      title="Test spécifique : PCL-5 court"
+      description="Auto-évaluation orientée traumatisme/stress (outil éducatif, non diagnostique)."
       testId="pcl5Short"
       apiPath="/api/tests/pcl5-court"
       recommendation={{

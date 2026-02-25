@@ -57,13 +57,6 @@ type ApiResult = {
   };
 };
 
-const titleMap: Record<QuestionnaireScore["questionnaireId"], string> = {
-  phq9: "PHQ-9 (dépression)",
-  gad7: "GAD-7 (anxiété)",
-  pcl5Short: "PCL-5 court (trauma)",
-  miniToc: "Mini-TOC",
-};
-
 const dominantLabelMap: Record<ApiResult["dominantCategory"], string> = {
   depression: "Dépression",
   anxiety: "Anxiété",
@@ -138,7 +131,7 @@ export default function Resultats() {
     setError(null);
     setDetails(null);
     try {
-      const cachedResult = localStorage.getItem("bilanApiResult");
+      const cachedResult = sessionStorage.getItem("bilanApiResult");
       if (cachedResult) {
         const parsed = JSON.parse(cachedResult) as ApiResult;
         setResult(parsed);
@@ -146,7 +139,7 @@ export default function Resultats() {
         return;
       }
 
-      const rawPayload = localStorage.getItem("bilanPayload");
+      const rawPayload = sessionStorage.getItem("bilanPayload");
       if (!rawPayload) {
         setError("Aucun questionnaire trouvé. Recommence le bilan.");
         setLoading(false);
@@ -170,7 +163,7 @@ export default function Resultats() {
       }
 
       const apiResult = (await response.json()) as ApiResult;
-      localStorage.setItem("bilanApiResult", JSON.stringify(apiResult));
+      sessionStorage.setItem("bilanApiResult", JSON.stringify(apiResult));
       setResult(apiResult);
       setLoading(false);
     } catch (computeError) {
@@ -191,7 +184,7 @@ export default function Resultats() {
       return 0;
     }
 
-    const values = Object.values(result.scores).map((score) => score.normalizedScore);
+    const values = Object.values(result.categoryScores);
     if (values.length === 0) {
       return 0;
     }
@@ -284,19 +277,6 @@ export default function Resultats() {
             Refaire le bilan
           </Link>
         </div>
-      </div>
-
-      <div className="grid gap-4">
-        {Object.values(result.scores).map((score) => (
-          <article key={score.questionnaireId} className="border rounded-xl p-4">
-            <h3 className="font-semibold mb-2">{titleMap[score.questionnaireId]}</h3>
-            <p className="text-sm text-gray-700 mb-1">
-              Score: {score.totalScore} / {score.maxScore}
-            </p>
-            <p className="text-sm text-gray-700 mb-1">Interprétation clinique: {score.interpretation.label}</p>
-            <p className="text-sm text-gray-700">{score.interpretation.clinicalMeaning}</p>
-          </article>
-        ))}
       </div>
 
       {result.safety.urgentSupportRecommended && (

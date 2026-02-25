@@ -20,8 +20,8 @@ export default async function TestMiniTocPage({
 
   return (
     <SpecificTestRunner
-      title="Test specifique: Mini-TOC"
-      description="Evaluation orientee symptomes obsessionnels-compulsifs (outil educatif, non diagnostique)."
+      title="Test spécifique : Mini-TOC"
+      description="Auto-évaluation orientée symptômes obsessionnels-compulsifs (outil éducatif, non diagnostique)."
       testId="miniToc"
       apiPath="/api/tests/mini-toc"
       recommendation={{

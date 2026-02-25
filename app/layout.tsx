@@ -6,10 +6,10 @@ import Footer from '../components/Footer';
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
-      <body className="bg-gray-50 text-gray-800 font-sans">
+      <body className="text-slate-800 antialiased">
         <Navbar />
         <main className="min-h-screen">
-          <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6 md:py-8">{children}</div>
+          <div className="mx-auto w-full max-w-7xl px-4 py-8 md:px-6 md:py-10">{children}</div>
         </main>
         <Footer />
       </body>

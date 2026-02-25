@@ -39,7 +39,7 @@ export type InterpretationResult = {
 };
 
 export type QuestionnaireDefinition = {
-  id: "phq9" | "gad7" | "pcl5Short" | "miniToc";
+  id: string;
   version: string;
   title: string;
   items: readonly QuestionnaireItem[];
@@ -50,7 +50,7 @@ export type QuestionnaireDefinition = {
 };
 
 export type QuestionnaireScore = {
-  questionnaireId: QuestionnaireDefinition["id"];
+  questionnaireId: string;
   version: string;
   totalScore: number;
   maxScore: number;

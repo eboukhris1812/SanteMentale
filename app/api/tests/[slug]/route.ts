@@ -1,8 +1,8 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { z } from "zod";
 import { scoreQuestionnaire } from "@/features/assessment/engine";
-import { questionnaireRegistry } from "@/features/assessment/schemas";
+import { getQuestionnaireByTestSlug } from "@/features/assessment/schemas";
 import { enforceRateLimit } from "@/lib/security/rateLimit";
-import { specificTestPayloadSchemas } from "@/lib/validation/specificTests";
 
 function extractClientIp(request: Request): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
@@ -12,11 +12,19 @@ function extractClientIp(request: Request): string {
   return request.headers.get("x-real-ip") ?? "unknown";
 }
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ slug: string }> }
+) {
   try {
+    const { slug } = await params;
+    const definition = getQuestionnaireByTestSlug(slug);
+    if (!definition) {
+      return NextResponse.json({ error: "Test introuvable" }, { status: 404 });
+    }
+
     const ip = extractClientIp(request);
     const rateLimit = await enforceRateLimit(ip);
-
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: "Limite de requêtes atteinte" },
@@ -30,21 +38,28 @@ export async function POST(request: Request) {
       );
     }
 
-    const payload = specificTestPayloadSchemas.pcl5Short.parse(await request.json());
-    const score = scoreQuestionnaire(questionnaireRegistry.pcl5Short, payload.answers);
+    const payloadSchema = z.object({
+      answers: z
+        .array(z.number().int().min(definition.scale.min).max(definition.scale.max))
+        .length(definition.items.length),
+    });
+
+    const payload = payloadSchema.parse(await request.json());
+    const score = scoreQuestionnaire(definition, payload.answers);
 
     return NextResponse.json(
       {
-        testId: "pcl5Short",
+        testId: definition.id,
         score,
         methodology: {
           framework: "Dépistage psychométrique éducatif (projet IB)",
-          source: questionnaireRegistry.pcl5Short.scoringRules.source,
+          source: definition.scoringRules.source,
           educationalPurposeOnly: true,
         },
         safety: {
           urgentSupportRecommended: false,
-          urgentSupportReason: "Aucune règle de signal critique immédiat n'est définie pour ce test.",
+          urgentSupportReason:
+            "Ce résultat est un repérage éducatif et ne remplace pas une évaluation clinique.",
         },
       },
       {
@@ -60,8 +75,7 @@ export async function POST(request: Request) {
     if (error instanceof Error && "name" in error && error.name === "ZodError") {
       return NextResponse.json({ error: "Format de données invalide" }, { status: 400 });
     }
-
-    console.error("/api/tests/pcl5-court POST failed", error);
+    console.error("/api/tests/[slug] POST failed", error);
     return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
   }
 }

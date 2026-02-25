@@ -10,22 +10,22 @@ const thresholds: readonly Threshold[] = [
     max: 3,
     label: "Charge TOC faible",
     severity: "minimal",
-    clinicalMeaning: "Sous les seuils de depistage OCI-4 couramment utilises.",
+    clinicalMeaning: "Sous les seuils de dépistage OCI-4 couramment utilisés.",
   },
   {
     min: 4,
     max: 5,
-    label: "Symptomes TOC eleves",
+    label: "Symptômes TOC élevés",
     severity: "mild",
-    clinicalMeaning: "Au-dessus d'un seuil de depistage large (orientation communautaire).",
+    clinicalMeaning: "Au-dessus d'un seuil de dépistage large (orientation communautaire).",
   },
   {
     min: 6,
     max: 16,
-    label: "TOC probable - depistage positif",
+    label: "TOC probable - dépistage positif",
     severity: "positive-screen",
     clinicalMeaning:
-      "Au-dessus d'un seuil plus specifique pour distinguer TOC et troubles anxieux.",
+      "Au-dessus d'un seuil plus spécifique pour distinguer TOC et troubles anxieux.",
   },
 ];
 
@@ -50,20 +50,33 @@ export const miniTocDefinition: QuestionnaireDefinition = {
   version: "1.0.0",
   title: "Mini-TOC (proxy OCI-4)",
   items: [
-    { id: "mini_toc_1", prompt: "Pensees intrusives et penibles." },
-    { id: "mini_toc_2", prompt: "Comportements repetes de verification." },
-    { id: "mini_toc_3", prompt: "Rituels repetitifs de lavage/nettoyage." },
-    { id: "mini_toc_4", prompt: "Besoin d'ordre/symetrie avec detresse." },
+    {
+      id: "mini_toc_1",
+      prompt: "Ces 7 derniers jours, à quel point as-tu eu des pensées qui reviennent sans arrêt et difficiles à chasser ?",
+    },
+    {
+      id: "mini_toc_2",
+      prompt:
+        "Ces 7 derniers jours, à quel point as-tu ressenti le besoin de vérifier plusieurs fois les mêmes choses (porte, devoirs, objets) ?",
+    },
+    {
+      id: "mini_toc_3",
+      prompt: "Ces 7 derniers jours, à quel point as-tu ressenti le besoin de laver ou nettoyer encore et encore ?",
+    },
+    {
+      id: "mini_toc_4",
+      prompt: "Ces 7 derniers jours, à quel point ton besoin d'ordre ou de symétrie t'a-t-il posé problème ?",
+    },
   ],
   scale: {
     min: 0,
     max: 4,
     anchors: {
-      0: "Pas du tout",
-      1: "Un peu",
-      2: "Moderement",
-      3: "Beaucoup",
-      4: "Extremement",
+      0: "Pas du tout (0)",
+      1: "Un peu (1)",
+      2: "Assez souvent (2)",
+      3: "Très souvent (3)",
+      4: "Tout le temps (4)",
     },
   },
   scoringRules: {

@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { error: "Limite de requetes atteinte" },
+        { error: "Limite de requêtes atteinte" },
         {
           status: 429,
           headers: {
@@ -38,13 +38,13 @@ export async function POST(request: Request) {
         testId: "miniToc",
         score,
         methodology: {
-          framework: "Depistage psychometrique educatif (projet IB)",
+          framework: "Dépistage psychométrique éducatif (projet IB)",
           source: questionnaireRegistry.miniToc.scoringRules.source,
           educationalPurposeOnly: true,
         },
         safety: {
           urgentSupportRecommended: false,
-          urgentSupportReason: "Aucune regle de signal critique immediat n'est definie pour ce test.",
+          urgentSupportReason: "Aucune règle de signal critique immédiat n'est définie pour ce test.",
         },
       },
       {
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     if (error instanceof Error && "name" in error && error.name === "ZodError") {
-      return NextResponse.json({ error: "Format de donnees invalide" }, { status: 400 });
+      return NextResponse.json({ error: "Format de données invalide" }, { status: 400 });
     }
 
     console.error("/api/tests/mini-toc POST failed", error);

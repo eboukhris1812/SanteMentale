@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { error: "Limite de requetes atteinte" },
+        { error: "Limite de requêtes atteinte" },
         {
           status: 429,
           headers: {
@@ -40,15 +40,15 @@ export async function POST(request: Request) {
         testId: "phq9",
         score,
         methodology: {
-          framework: "Depistage psychometrique educatif (projet IB)",
+          framework: "Dépistage psychométrique éducatif (projet IB)",
           source: questionnaireRegistry.phq9.scoringRules.source,
           educationalPurposeOnly: true,
         },
         safety: {
           urgentSupportRecommended,
           urgentSupportReason: urgentSupportRecommended
-            ? "Item 9 du PHQ-9 > 0: demande rapidement de l'aide a un adulte de confiance ou a un professionnel."
-            : "Aucun signal critique immediat detecte sur l'item 9 du PHQ-9.",
+            ? "Item 9 du PHQ-9 > 0 : demande rapidement de l'aide à un adulte de confiance ou à un professionnel."
+            : "Aucun signal critique immédiat détecté sur l'item 9 du PHQ-9.",
         },
       },
       {
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     if (error instanceof Error && "name" in error && error.name === "ZodError") {
-      return NextResponse.json({ error: "Format de donnees invalide" }, { status: 400 });
+      return NextResponse.json({ error: "Format de données invalide" }, { status: 400 });
     }
 
     console.error("/api/tests/phq9 POST failed", error);

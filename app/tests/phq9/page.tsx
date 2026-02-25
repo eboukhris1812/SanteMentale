@@ -20,8 +20,8 @@ export default async function TestPhq9Page({
 
   return (
     <SpecificTestRunner
-      title="Test specifique: PHQ-9"
-      description="Evaluation orientee depression (outil educatif, non diagnostique)."
+      title="Test spécifique : PHQ-9"
+      description="Auto-évaluation orientée dépression (outil éducatif, non diagnostique)."
       testId="phq9"
       apiPath="/api/tests/phq9"
       recommendation={{

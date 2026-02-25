@@ -8,37 +8,37 @@ const thresholds: readonly Threshold[] = [
   {
     min: 0,
     max: 4,
-    label: "Depression minimale",
+    label: "Dépression minimale",
     severity: "minimal",
-    clinicalMeaning: "Charge symptomatique generalement sous le seuil de preoccupation clinique.",
+    clinicalMeaning: "Charge symptomatique généralement sous le seuil de préoccupation clinique.",
   },
   {
     min: 5,
     max: 9,
-    label: "Depression legere",
+    label: "Dépression légère",
     severity: "mild",
-    clinicalMeaning: "Surveillance des symptomes et du fonctionnement psychosocial recommandee.",
+    clinicalMeaning: "Surveillance des symptômes et du fonctionnement psychosocial recommandée.",
   },
   {
     min: 10,
     max: 14,
-    label: "Depression moderee",
+    label: "Dépression modérée",
     severity: "moderate",
-    clinicalMeaning: "Plage cliniquement significative; une evaluation complementaire est recommandee.",
+    clinicalMeaning: "Plage cliniquement significative; une évaluation complémentaire est recommandée.",
   },
   {
     min: 15,
     max: 19,
-    label: "Depression moderee a severe",
+    label: "Dépression modérée à sévère",
     severity: "moderately-severe",
-    clinicalMeaning: "Charge symptomatique elevee; suivi clinique actif recommande.",
+    clinicalMeaning: "Charge symptomatique élevée; suivi clinique actif recommandé.",
   },
   {
     min: 20,
     max: 27,
-    label: "Depression severe",
+    label: "Dépression sévère",
     severity: "severe",
-    clinicalMeaning: "Charge symptomatique tres elevee; evaluation clinique rapide recommandee.",
+    clinicalMeaning: "Charge symptomatique très élevée; évaluation clinique rapide recommandée.",
   },
 ];
 
@@ -63,24 +63,54 @@ export const phq9Definition: QuestionnaireDefinition = {
   version: "1.0.0",
   title: "Patient Health Questionnaire-9",
   items: [
-    { id: "phq9_1", prompt: "Peu d'interet ou de plaisir a faire les choses." },
-    { id: "phq9_2", prompt: "Se sentir triste, deprime(e) ou sans espoir." },
-    { id: "phq9_3", prompt: "Difficultes de sommeil (endormissement, reveils, ou trop dormir)." },
-    { id: "phq9_4", prompt: "Se sentir fatigue(e) ou manquer d'energie." },
-    { id: "phq9_5", prompt: "Peu d'appetit ou manger excessivement." },
-    { id: "phq9_6", prompt: "Se sentir nul(le), en echec ou se culpabiliser." },
-    { id: "phq9_7", prompt: "Difficulte a se concentrer (cours, lecture, devoirs)." },
-    { id: "phq9_8", prompt: "Lenteur inhabituelle ou agitation importante." },
-    { id: "phq9_9", prompt: "Pensees que tu serais mieux mort(e) ou de te faire du mal." },
+    {
+      id: "phq9_1",
+      prompt: "Ces 7 derniers jours, as-tu eu moins d'envie ou de plaisir à faire tes activités ?",
+    },
+    {
+      id: "phq9_2",
+      prompt: "Ces 7 derniers jours, t'es-tu senti(e) triste, découragé(e) ou sans espoir ?",
+    },
+    {
+      id: "phq9_3",
+      prompt:
+        "Ces 7 derniers jours, as-tu eu des problèmes de sommeil (difficulté à t'endormir, réveils, ou trop dormir) ?",
+    },
+    {
+      id: "phq9_4",
+      prompt: "Ces 7 derniers jours, t'es-tu senti(e) fatigué(e) ou sans énergie ?",
+    },
+    {
+      id: "phq9_5",
+      prompt:
+        "Ces 7 derniers jours, as-tu remarqué que ton appétit avait beaucoup changé (moins faim ou plus faim) ?",
+    },
+    {
+      id: "phq9_6",
+      prompt: "Ces 7 derniers jours, t'es-tu senti(e) nul(le), en échec ou trop coupable ?",
+    },
+    {
+      id: "phq9_7",
+      prompt:
+        "Ces 7 derniers jours, as-tu eu du mal à te concentrer (en cours, en lisant ou pour les devoirs) ?",
+    },
+    {
+      id: "phq9_8",
+      prompt: "Ces 7 derniers jours, as-tu été beaucoup plus lent(e) que d'habitude, ou au contraire très agité(e) ?",
+    },
+    {
+      id: "phq9_9",
+      prompt: "Ces 7 derniers jours, as-tu eu des pensées de mort ou l'idée de te faire du mal ?",
+    },
   ],
   scale: {
     min: 0,
     max: 3,
     anchors: {
-      0: "Pas du tout",
-      1: "Plusieurs jours",
-      2: "Plus de la moitie des jours",
-      3: "Presque tous les jours",
+      0: "Jamais (0 jour)",
+      1: "Rarement (1 à 2 jours)",
+      2: "Souvent (3 à 4 jours)",
+      3: "Très souvent (5 à 7 jours)",
     },
   },
   scoringRules: {

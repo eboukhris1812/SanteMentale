@@ -20,8 +20,8 @@ export default async function TestGad7Page({
 
   return (
     <SpecificTestRunner
-      title="Test specifique: GAD-7"
-      description="Evaluation orientee anxiete (outil educatif, non diagnostique)."
+      title="Test spécifique : GAD-7"
+      description="Auto-évaluation orientée anxiété (outil éducatif, non diagnostique)."
       testId="gad7"
       apiPath="/api/tests/gad7"
       recommendation={{

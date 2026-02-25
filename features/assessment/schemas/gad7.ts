@@ -8,30 +8,30 @@ const thresholds: readonly Threshold[] = [
   {
     min: 0,
     max: 4,
-    label: "Anxiete minimale",
+    label: "Anxiété minimale",
     severity: "minimal",
     clinicalMeaning: "Sous le seuil clinique usuel.",
   },
   {
     min: 5,
     max: 9,
-    label: "Anxiete legere",
+    label: "Anxiété légère",
     severity: "mild",
-    clinicalMeaning: "Surveillance des symptomes et psychoeducation utiles.",
+    clinicalMeaning: "Surveillance des symptômes et psychoéducation utiles.",
   },
   {
     min: 10,
     max: 14,
-    label: "Anxiete moderee",
+    label: "Anxiété modérée",
     severity: "moderate",
-    clinicalMeaning: "Plage cliniquement pertinente; evaluation complementaire recommandee.",
+    clinicalMeaning: "Plage cliniquement pertinente; évaluation complémentaire recommandée.",
   },
   {
     min: 15,
     max: 21,
-    label: "Anxiete severe",
+    label: "Anxiété sévère",
     severity: "severe",
-    clinicalMeaning: "Charge symptomatique elevee; suivi clinique recommande.",
+    clinicalMeaning: "Charge symptomatique élevée; suivi clinique recommandé.",
   },
 ];
 
@@ -56,22 +56,43 @@ export const gad7Definition: QuestionnaireDefinition = {
   version: "1.0.0",
   title: "Generalized Anxiety Disorder-7",
   items: [
-    { id: "gad7_1", prompt: "Se sentir nerveux(se), anxieux(se) ou a bout." },
-    { id: "gad7_2", prompt: "Ne pas reussir a arreter de s'inquieter." },
-    { id: "gad7_3", prompt: "S'inquieter trop pour differentes choses." },
-    { id: "gad7_4", prompt: "Avoir du mal a se detendre." },
-    { id: "gad7_5", prompt: "Etre tellement agite(e) qu'il est difficile de rester en place." },
-    { id: "gad7_6", prompt: "Devenir facilement irritable." },
-    { id: "gad7_7", prompt: "Avoir peur que quelque chose de grave arrive." },
+    {
+      id: "gad7_1",
+      prompt: "Ces 7 derniers jours, t'es-tu senti(e) nerveux(se), anxieux(se) ou à bout ?",
+    },
+    {
+      id: "gad7_2",
+      prompt: "Ces 7 derniers jours, as-tu eu du mal à arrêter de t'inquiéter ?",
+    },
+    {
+      id: "gad7_3",
+      prompt: "Ces 7 derniers jours, t'es-tu trop inquiété(e) pour plusieurs choses à la fois ?",
+    },
+    {
+      id: "gad7_4",
+      prompt: "Ces 7 derniers jours, as-tu eu du mal à te détendre ?",
+    },
+    {
+      id: "gad7_5",
+      prompt: "Ces 7 derniers jours, t'es-tu senti(e) tellement agité(e) qu'il était difficile de rester en place ?",
+    },
+    {
+      id: "gad7_6",
+      prompt: "Ces 7 derniers jours, as-tu été facilement irritable ou énervé(e) ?",
+    },
+    {
+      id: "gad7_7",
+      prompt: "Ces 7 derniers jours, as-tu eu peur que quelque chose de grave arrive ?",
+    },
   ],
   scale: {
     min: 0,
     max: 3,
     anchors: {
-      0: "Pas du tout",
-      1: "Plusieurs jours",
-      2: "Plus de la moitie des jours",
-      3: "Presque tous les jours",
+      0: "Jamais (0 jour)",
+      1: "Rarement (1 à 2 jours)",
+      2: "Souvent (3 à 4 jours)",
+      3: "Très souvent (5 à 7 jours)",
     },
   },
   scoringRules: {
