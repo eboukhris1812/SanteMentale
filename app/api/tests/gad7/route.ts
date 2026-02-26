@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { scoreQuestionnaire } from "@/features/assessment/engine";
+import {
+  generateSpecificTestReport,
+  scoreQuestionnaire,
+} from "@/features/assessment/engine";
 import { questionnaireRegistry } from "@/features/assessment/schemas";
 import { enforceRateLimit } from "@/lib/security/rateLimit";
 import { specificTestPayloadSchemas } from "@/lib/validation/specificTests";
@@ -32,11 +35,13 @@ export async function POST(request: Request) {
 
     const payload = specificTestPayloadSchemas.gad7.parse(await request.json());
     const score = scoreQuestionnaire(questionnaireRegistry.gad7, payload.answers);
+    const naturalReport = generateSpecificTestReport("gad7", score);
 
     return NextResponse.json(
       {
         testId: "gad7",
         score,
+        naturalReport,
         methodology: {
           framework: "Dépistage psychométrique éducatif (projet IB)",
           source: questionnaireRegistry.gad7.scoringRules.source,

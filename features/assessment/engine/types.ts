@@ -73,3 +73,48 @@ export type QuestionnaireScore = {
   components?: Record<string, number>;
   interpretation: InterpretationResult;
 };
+
+// IB note: these report types are separated from scoring primitives to keep
+// deterministic generation auditable and easy to evolve without touching scoring math.
+export type DominantCategory =
+  | "depression"
+  | "anxiety"
+  | "trauma"
+  | "ocd"
+  | "personality"
+  | "eating"
+  | "neurodevelopment";
+
+// IB note: this severity scale is intentionally simple for adolescent readability.
+export type ReportSeverityLevel = "minimal" | "mild" | "moderate" | "high";
+
+export type ScaleType = "depression" | "anxiety" | "ptsd" | "ocd";
+
+export interface AssessmentResults {
+  scores: {
+    phq9: QuestionnaireScore;
+    gad7: QuestionnaireScore;
+    pcl5Short: QuestionnaireScore;
+    miniToc: QuestionnaireScore;
+  };
+  categoryScores: Record<DominantCategory, number>;
+  dominantCategory: DominantCategory;
+}
+
+export interface NaturalReport {
+  introduction: string;
+  emotionalSummary: string;
+  dominantFocus: string;
+  psychoeducation: string;
+  recommendations: string[];
+  encouragement: string;
+  ethicalNotice: string;
+}
+
+export type IntensityBand = "light" | "moderate" | "high";
+
+export interface SpecificTestNaturalReport {
+  introduction: string;
+  emotionalSummary: string;
+  dominantFocus: string;
+}

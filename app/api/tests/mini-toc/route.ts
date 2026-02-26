@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { scoreQuestionnaire } from "@/features/assessment/engine";
+import {
+  generateSpecificTestReport,
+  scoreQuestionnaire,
+} from "@/features/assessment/engine";
 import { questionnaireRegistry } from "@/features/assessment/schemas";
 import { enforceRateLimit } from "@/lib/security/rateLimit";
 import { specificTestPayloadSchemas } from "@/lib/validation/specificTests";
@@ -32,11 +35,13 @@ export async function POST(request: Request) {
 
     const payload = specificTestPayloadSchemas.miniToc.parse(await request.json());
     const score = scoreQuestionnaire(questionnaireRegistry.miniToc, payload.answers);
+    const naturalReport = generateSpecificTestReport("miniToc", score);
 
     return NextResponse.json(
       {
         testId: "miniToc",
         score,
+        naturalReport,
         methodology: {
           framework: "Dépistage psychométrique éducatif (projet IB)",
           source: questionnaireRegistry.miniToc.scoringRules.source,

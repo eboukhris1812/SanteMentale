@@ -18,21 +18,41 @@ type QuestionnaireScore = {
   interpretation: Interpretation;
 };
 
+type NaturalReport = {
+  introduction: string;
+  emotionalSummary: string;
+  dominantFocus: string;
+  psychoeducation: string;
+  recommendations: string[];
+  encouragement: string;
+  ethicalNotice: string;
+};
+
 type ApiResult = {
-  scores: {
-    phq9: QuestionnaireScore;
-    gad7: QuestionnaireScore;
-    pcl5Short: QuestionnaireScore;
-    miniToc: QuestionnaireScore;
-  };
-  categoryScores: {
-    depression: number;
-    anxiety: number;
-    trauma: number;
-    ocd: number;
-    personality: number;
-    eating: number;
-    neurodevelopment: number;
+  results: {
+    scores: {
+      phq9: QuestionnaireScore;
+      gad7: QuestionnaireScore;
+      pcl5Short: QuestionnaireScore;
+      miniToc: QuestionnaireScore;
+    };
+    categoryScores: {
+      depression: number;
+      anxiety: number;
+      trauma: number;
+      ocd: number;
+      personality: number;
+      eating: number;
+      neurodevelopment: number;
+    };
+    dominantCategory:
+      | "depression"
+      | "anxiety"
+      | "trauma"
+      | "ocd"
+      | "personality"
+      | "eating"
+      | "neurodevelopment";
   };
   dominantCategory:
     | "depression"
@@ -42,6 +62,7 @@ type ApiResult = {
     | "personality"
     | "eating"
     | "neurodevelopment";
+  naturalReport: NaturalReport;
   methodology: {
     framework: string;
     scoringMethod: string;
@@ -56,6 +77,24 @@ type ApiResult = {
     urgentSupportReason: string;
   };
 };
+
+function normalizeApiResult(input: ApiResult | (Omit<ApiResult, "results"> & {
+  scores: ApiResult["results"]["scores"];
+  categoryScores: ApiResult["results"]["categoryScores"];
+})): ApiResult {
+  if ("results" in input) {
+    return input;
+  }
+
+  return {
+    ...input,
+    results: {
+      scores: input.scores,
+      categoryScores: input.categoryScores,
+      dominantCategory: input.dominantCategory,
+    },
+  };
+}
 
 const dominantLabelMap: Record<ApiResult["dominantCategory"], string> = {
   depression: "Dépression",
@@ -133,8 +172,11 @@ export default function Resultats() {
     try {
       const cachedResult = sessionStorage.getItem("bilanApiResult");
       if (cachedResult) {
-        const parsed = JSON.parse(cachedResult) as ApiResult;
-        setResult(parsed);
+        const parsed = JSON.parse(cachedResult) as ApiResult | (Omit<ApiResult, "results"> & {
+          scores: ApiResult["results"]["scores"];
+          categoryScores: ApiResult["results"]["categoryScores"];
+        });
+        setResult(normalizeApiResult(parsed));
         setLoading(false);
         return;
       }
@@ -162,7 +204,12 @@ export default function Resultats() {
         throw new Error(`Erreur API ${response.status}: ${detail}`);
       }
 
-      const apiResult = (await response.json()) as ApiResult;
+      const apiResult = normalizeApiResult(
+        (await response.json()) as ApiResult | (Omit<ApiResult, "results"> & {
+          scores: ApiResult["results"]["scores"];
+          categoryScores: ApiResult["results"]["categoryScores"];
+        })
+      );
       sessionStorage.setItem("bilanApiResult", JSON.stringify(apiResult));
       setResult(apiResult);
       setLoading(false);
@@ -184,7 +231,7 @@ export default function Resultats() {
       return 0;
     }
 
-    const values = Object.values(result.categoryScores);
+    const values = Object.values(result.results.categoryScores);
     if (values.length === 0) {
       return 0;
     }
@@ -239,12 +286,50 @@ export default function Resultats() {
       <div className="rounded-xl border border-gray-200 bg-white p-4">
         <p className="font-medium mb-2">Scores par catégorie</p>
         <div className="grid gap-2 md:grid-cols-2">
-          {Object.entries(result.categoryScores).map(([key, value]) => (
+          {Object.entries(result.results.categoryScores).map(([key, value]) => (
             <p key={key} className="text-sm text-gray-700">
               {dominantLabelMap[key as ApiResult["dominantCategory"]]}:{" "}
               <span className="font-semibold">{(value * 100).toFixed(1)}%</span>
             </p>
           ))}
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3">
+        <p className="font-semibold text-emerald-900">Synthèse de ton évaluation</p>
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-emerald-900">1. Introduction</p>
+          <p className="text-sm text-emerald-950">{result.naturalReport.introduction}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-emerald-900">2. Résumé émotionnel</p>
+          <p className="text-sm text-emerald-950">{result.naturalReport.emotionalSummary}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-emerald-900">
+            3. Focus sur la catégorie dominante
+          </p>
+          <p className="text-sm text-emerald-950">{result.naturalReport.dominantFocus}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-emerald-900">4. Psychoéducation</p>
+          <p className="text-sm text-emerald-950">{result.naturalReport.psychoeducation}</p>
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-emerald-900 mb-1">5. Recommandations</p>
+          <ul className="list-disc pl-5 space-y-1 text-sm text-emerald-950">
+            {result.naturalReport.recommendations.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-emerald-900">6. Encouragement</p>
+          <p className="text-sm text-emerald-950">{result.naturalReport.encouragement}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-emerald-900">7. Avertissement éthique</p>
+          <p className="text-xs text-emerald-900">{result.naturalReport.ethicalNotice}</p>
         </div>
       </div>
 

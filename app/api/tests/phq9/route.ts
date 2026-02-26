@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { scoreQuestionnaire } from "@/features/assessment/engine";
+import {
+  generateSpecificTestReport,
+  scoreQuestionnaire,
+} from "@/features/assessment/engine";
 import { questionnaireRegistry } from "@/features/assessment/schemas";
 import { enforceRateLimit } from "@/lib/security/rateLimit";
 import { specificTestPayloadSchemas } from "@/lib/validation/specificTests";
@@ -32,6 +35,7 @@ export async function POST(request: Request) {
 
     const payload = specificTestPayloadSchemas.phq9.parse(await request.json());
     const score = scoreQuestionnaire(questionnaireRegistry.phq9, payload.answers);
+    const naturalReport = generateSpecificTestReport("phq9", score);
     const phq9Item9 = payload.answers[8] ?? 0;
     const urgentSupportRecommended = phq9Item9 >= 1;
 
@@ -39,6 +43,7 @@ export async function POST(request: Request) {
       {
         testId: "phq9",
         score,
+        naturalReport,
         methodology: {
           framework: "Dépistage psychométrique éducatif (projet IB)",
           source: questionnaireRegistry.phq9.scoringRules.source,

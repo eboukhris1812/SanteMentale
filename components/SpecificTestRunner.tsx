@@ -10,6 +10,11 @@ type QuestionnaireId = keyof typeof questionnaireRegistry;
 type SpecificTestApiResponse = {
   testId: QuestionnaireId;
   score: QuestionnaireScore;
+  naturalReport?: {
+    introduction: string;
+    emotionalSummary: string;
+    dominantFocus: string;
+  };
   methodology: {
     framework: string;
     source: string;
@@ -286,6 +291,26 @@ export default function SpecificTestRunner({
           <p className="text-sm text-gray-700 mb-1">{result.score.interpretation.label}</p>
           <p className="text-sm text-gray-700">{result.score.interpretation.clinicalMeaning}</p>
         </div>
+
+        {result.naturalReport && (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3">
+            <p className="font-semibold text-emerald-900">Synthèse de ton évaluation</p>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-emerald-900">1. Introduction</p>
+              <p className="text-sm text-emerald-950">{result.naturalReport.introduction}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-emerald-900">2. Résumé émotionnel</p>
+              <p className="text-sm text-emerald-950">{result.naturalReport.emotionalSummary}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-emerald-900">
+                3. Focus sur la catégorie dominante
+              </p>
+              <p className="text-sm text-emerald-950">{result.naturalReport.dominantFocus}</p>
+            </div>
+          </div>
+        )}
 
         {isPdqSectionTest && (
           <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-900">

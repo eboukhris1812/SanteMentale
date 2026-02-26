@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { scoreQuestionnaire } from "@/features/assessment/engine";
+import {
+  generateSpecificTestReport,
+  scoreQuestionnaire,
+} from "@/features/assessment/engine";
 import { getQuestionnaireByTestSlug } from "@/features/assessment/schemas";
 import { enforceRateLimit } from "@/lib/security/rateLimit";
 
@@ -46,20 +49,29 @@ export async function POST(
 
     const payload = payloadSchema.parse(await request.json());
     const score = scoreQuestionnaire(definition, payload.answers);
+    const naturalReport = generateSpecificTestReport(definition.id, score);
+    const urgentSupportRecommended =
+      definition.id === "phq9" ? (payload.answers[8] ?? 0) >= 1 : false;
+    const urgentSupportReason =
+      definition.id === "phq9"
+        ? urgentSupportRecommended
+          ? "Item 9 du PHQ-9 > 0 : demande rapidement de l'aide à un adulte de confiance ou à un professionnel."
+          : "Aucun signal critique immédiat détecté sur l'item 9 du PHQ-9."
+        : "Ce résultat est un repérage éducatif et ne remplace pas une évaluation clinique.";
 
     return NextResponse.json(
       {
         testId: definition.id,
         score,
+        naturalReport,
         methodology: {
           framework: "Dépistage psychométrique éducatif (projet IB)",
           source: definition.scoringRules.source,
           educationalPurposeOnly: true,
         },
         safety: {
-          urgentSupportRecommended: false,
-          urgentSupportReason:
-            "Ce résultat est un repérage éducatif et ne remplace pas une évaluation clinique.",
+          urgentSupportRecommended,
+          urgentSupportReason,
         },
       },
       {

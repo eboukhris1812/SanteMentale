@@ -1,17 +1,13 @@
 import { NextResponse } from "next/server";
-import { scoreQuestionnaire } from "@/features/assessment/engine";
+import {
+  generateNaturalReport,
+  scoreQuestionnaire,
+  type AssessmentResults,
+  type DominantCategory,
+} from "@/features/assessment/engine";
 import { questionnaireRegistry } from "@/features/assessment/schemas";
 import { enforceRateLimit } from "@/lib/security/rateLimit";
 import { bilanPayloadSchema } from "@/lib/validation/bilan";
-
-type DominantCategory =
-  | "depression"
-  | "anxiety"
-  | "trauma"
-  | "ocd"
-  | "personality"
-  | "eating"
-  | "neurodevelopment";
 
 function normalizeScreen(answers: number[], maxPerItem: number): number {
   const maxScore = answers.length * maxPerItem;
@@ -94,19 +90,30 @@ export async function POST(request: Request) {
       (a, b) => b[1] - a[1]
     )[0]?.[0] ?? "depression") as DominantCategory;
 
+    const results: AssessmentResults = {
+      scores: {
+        phq9,
+        gad7,
+        pcl5Short,
+        miniToc,
+      },
+      categoryScores: dominantMap,
+      dominantCategory,
+    };
+
+    const naturalReport = generateNaturalReport(results);
+
     const phq9Item9 = payload.phq9[8] ?? 0;
     const urgentSupportRecommended = phq9Item9 >= 1;
 
     return NextResponse.json(
       {
-        scores: {
-          phq9,
-          gad7,
-          pcl5Short,
-          miniToc,
-        },
-        categoryScores: dominantMap,
+        results,
         dominantCategory,
+        naturalReport,
+        // Backward-compatible aliases to avoid breaking existing frontend code during migration.
+        scores: results.scores,
+        categoryScores: results.categoryScores,
         methodology: {
           framework: "dépistage psychométrique éducatif pour projet academique IB",
           scoringMethod:
