@@ -103,10 +103,10 @@ function withDeContraction(phraseWithArticle: string): string {
 function emotionalSummary(domain: Domain, band: Band): string {
   const label = domainLabel(domain);
   if (band === "light") {
-    return `D’après tes réponses, ${label} semble un peu sensible en ce moment, mais avec des moments où ça reste gérable au quotidien.`;
+    return "Tes réponses ne montrent pas de signe préoccupant pour ce test. Globalement, c’est plutôt rassurant.";
   }
   if (band === "moderate") {
-    return `D’après tes réponses, ${label} prend une place notable en ce moment. Cela peut fatiguer, réduire la concentration ou rendre certaines journées plus lourdes.`;
+    return `D’après tes réponses, ${label} prend une place modérée en ce moment. Cela peut fatiguer un peu, mais des ajustements simples (sommeil, rythme, pauses, échange avec un adulte) peuvent déjà aider.`;
   }
   return `D’après tes réponses, ${label} semble très présent en ce moment. Cela peut peser sur l’école, les relations, le sommeil et l’énergie.`;
 }
@@ -115,12 +115,12 @@ function dominantFocus(domain: Domain, band: Band): string {
   const label = domainLabel(domain);
   const deLabel = withDeContraction(label);
   if (band === "light") {
-    return `Ce test ciblé montre surtout une vigilance autour ${deLabel}. Avec des repères simples, tu peux déjà améliorer les choses.`;
+    return "Aucune catégorie dominante nette ne ressort à ce stade.";
   }
   if (band === "moderate") {
     return `Ce test ciblé montre surtout que ${label} mérite une attention régulière. Tu peux agir progressivement avec de petites habitudes et du soutien.`;
   }
-  return `Ce test ciblé montre surtout que ${label} est actuellement au premier plan. À ce niveau, c’est important de ne pas rester seul·e et d’en parler à un adulte de confiance.`;
+  return `Ce test ciblé montre surtout que ${label} est actuellement au premier plan. À ce niveau, c’est important de demander de l’aide à un adulte de confiance et, si possible, à un professionnel.`;
 }
 
 export function generateSpecificTestReport(
@@ -135,5 +135,6 @@ export function generateSpecificTestReport(
     introduction: introByBand(band),
     emotionalSummary: emotionalSummary(domain, band),
     dominantFocus: dominantFocus(domain, band),
+    hasDominantCategory: band !== "light",
   };
 }

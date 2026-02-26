@@ -98,7 +98,8 @@ export interface AssessmentResults {
     miniToc: QuestionnaireScore;
   };
   categoryScores: Record<DominantCategory, number>;
-  dominantCategory: DominantCategory;
+  dominantCategories: DominantCategory[];
+  dominantCategory: DominantCategory | null;
 }
 
 export interface NaturalReport {
@@ -117,4 +118,5 @@ export interface SpecificTestNaturalReport {
   introduction: string;
   emotionalSummary: string;
   dominantFocus: string;
+  hasDominantCategory: boolean;
 }

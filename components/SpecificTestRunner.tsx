@@ -14,6 +14,7 @@ type SpecificTestApiResponse = {
     introduction: string;
     emotionalSummary: string;
     dominantFocus: string;
+    hasDominantCategory: boolean;
   };
   methodology: {
     framework: string;
@@ -305,7 +306,9 @@ export default function SpecificTestRunner({
             </div>
             <div className="space-y-1">
               <p className="text-sm font-semibold text-emerald-900">
-                3. Focus sur la catégorie dominante
+                {result.naturalReport.hasDominantCategory
+                  ? "3. Focus sur la catégorie dominante"
+                  : "3. Focus général"}
               </p>
               <p className="text-sm text-emerald-950">{result.naturalReport.dominantFocus}</p>
             </div>

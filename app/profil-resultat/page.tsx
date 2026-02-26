@@ -52,8 +52,27 @@ type ApiResult = {
       | "ocd"
       | "personality"
       | "eating"
-      | "neurodevelopment";
+      | "neurodevelopment"
+      | null;
+    dominantCategories: Array<
+      | "depression"
+      | "anxiety"
+      | "trauma"
+      | "ocd"
+      | "personality"
+      | "eating"
+      | "neurodevelopment"
+    >;
   };
+  dominantCategories: Array<
+    | "depression"
+    | "anxiety"
+    | "trauma"
+    | "ocd"
+    | "personality"
+    | "eating"
+    | "neurodevelopment"
+  >;
   dominantCategory:
     | "depression"
     | "anxiety"
@@ -61,7 +80,8 @@ type ApiResult = {
     | "ocd"
     | "personality"
     | "eating"
-    | "neurodevelopment";
+    | "neurodevelopment"
+    | null;
   naturalReport: NaturalReport;
   methodology: {
     framework: string;
@@ -83,7 +103,26 @@ function normalizeApiResult(input: ApiResult | (Omit<ApiResult, "results"> & {
   categoryScores: ApiResult["results"]["categoryScores"];
 })): ApiResult {
   if ("results" in input) {
-    return input;
+    const maybeLegacy = input as ApiResult & {
+      dominantCategories?: ApiResult["dominantCategories"];
+      results: ApiResult["results"] & {
+        dominantCategories?: ApiResult["dominantCategories"];
+      };
+    };
+
+    const resolvedDominantCategories =
+      maybeLegacy.dominantCategories ??
+      maybeLegacy.results.dominantCategories ??
+      (maybeLegacy.dominantCategory ? [maybeLegacy.dominantCategory] : []);
+
+    return {
+      ...maybeLegacy,
+      dominantCategories: resolvedDominantCategories,
+      results: {
+        ...maybeLegacy.results,
+        dominantCategories: resolvedDominantCategories,
+      },
+    };
   }
 
   return {
@@ -92,11 +131,13 @@ function normalizeApiResult(input: ApiResult | (Omit<ApiResult, "results"> & {
       scores: input.scores,
       categoryScores: input.categoryScores,
       dominantCategory: input.dominantCategory,
+      dominantCategories: input.dominantCategory ? [input.dominantCategory] : [],
     },
+    dominantCategories: input.dominantCategory ? [input.dominantCategory] : [],
   };
 }
 
-const dominantLabelMap: Record<ApiResult["dominantCategory"], string> = {
+const dominantLabelMap: Record<Exclude<ApiResult["dominantCategory"], null>, string> = {
   depression: "Dépression",
   anxiety: "Anxiété",
   trauma: "Trauma",
@@ -107,7 +148,7 @@ const dominantLabelMap: Record<ApiResult["dominantCategory"], string> = {
 };
 
 const orientationMap: Record<
-  ApiResult["dominantCategory"],
+  Exclude<ApiResult["dominantCategory"], null>,
   {
     specificTestName: string;
     specificTestHref: string;
@@ -153,7 +194,7 @@ const orientationMap: Record<
 
 function withRecommendationParams(
   href: string,
-  dominantCategory: ApiResult["dominantCategory"]
+  dominantCategory: Exclude<ApiResult["dominantCategory"], null>
 ): string {
   const separator = href.includes("?") ? "&" : "?";
   return `${href}${separator}source=bilan-global&recommended=1&dominant=${dominantCategory}`;
@@ -280,7 +321,13 @@ export default function Resultats() {
 
       <div className="p-4 bg-gray-50 rounded-xl">
         <p className="font-medium">Catégorie dominante</p>
-        <p className="text-lg">{dominantLabelMap[result.dominantCategory]}</p>
+        <p className="text-lg">
+          {result.dominantCategories.length === 0
+            ? "Aucune dominante (sous seuil de dépistage)"
+            : result.dominantCategories
+                .map((key) => dominantLabelMap[key])
+                .join(" / ")}
+        </p>
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white p-4">
@@ -288,7 +335,7 @@ export default function Resultats() {
         <div className="grid gap-2 md:grid-cols-2">
           {Object.entries(result.results.categoryScores).map(([key, value]) => (
             <p key={key} className="text-sm text-gray-700">
-              {dominantLabelMap[key as ApiResult["dominantCategory"]]}:{" "}
+              {dominantLabelMap[key as Exclude<ApiResult["dominantCategory"], null>]}:{" "}
               <span className="font-semibold">{(value * 100).toFixed(1)}%</span>
             </p>
           ))}
@@ -333,36 +380,38 @@ export default function Resultats() {
         </div>
       </div>
 
-      <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
-        <p className="font-semibold mb-1">Étape suivante recommandée</p>
-        <p className="text-sm text-gray-700 mb-3">
-          Continue avec un test ciblé ({orientationMap[result.dominantCategory].specificTestName})
-          ou consulte la fiche explicative associée.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href={withRecommendationParams(
-              orientationMap[result.dominantCategory].specificTestHref,
-              result.dominantCategory
-            )}
-            className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700"
-          >
-            Aller au test spécifique
-          </Link>
-          <Link
-            href={orientationMap[result.dominantCategory].troubleSheetHref}
-            className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-50"
-          >
-            Voir la fiche trouble
-          </Link>
-          <Link
-            href="/bilan-global"
-            className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-50"
-          >
-            Refaire le bilan
-          </Link>
+      {result.dominantCategory && result.dominantCategories.length === 1 && (
+        <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+          <p className="font-semibold mb-1">Étape suivante recommandée</p>
+          <p className="text-sm text-gray-700 mb-3">
+            Continue avec un test ciblé ({orientationMap[result.dominantCategory].specificTestName})
+            ou consulte la fiche explicative associée.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={withRecommendationParams(
+                orientationMap[result.dominantCategory].specificTestHref,
+                result.dominantCategory
+              )}
+              className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700"
+            >
+              Aller au test spécifique
+            </Link>
+            <Link
+              href={orientationMap[result.dominantCategory].troubleSheetHref}
+              className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-50"
+            >
+              Voir la fiche trouble
+            </Link>
+            <Link
+              href="/bilan-global"
+              className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-50"
+            >
+              Refaire le bilan
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
 
       {result.safety.urgentSupportRecommended && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-900">

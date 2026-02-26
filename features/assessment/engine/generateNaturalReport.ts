@@ -9,28 +9,22 @@ import type {
   NaturalReport,
 } from "@/features/assessment/engine/types";
 
-function getDominantBand(results: AssessmentResults): SeverityBand {
-  const category = results.dominantCategory;
+const SEVERITY_WEIGHT: Record<SeverityBand, number> = {
+  low: 0,
+  medium: 1,
+  high: 2,
+};
 
-  // IB note: when a validated test exists (PHQ-9, GAD-7, PCL-5 court, Mini-TOC),
-  // we prioritize its raw score thresholds for scientific coherence.
-  if (category === "depression") {
-    return interpretSeverity(results.scores.phq9.totalScore, "depression");
-  }
-  if (category === "anxiety") {
-    return interpretSeverity(results.scores.gad7.totalScore, "anxiety");
-  }
-  if (category === "trauma") {
-    return interpretSeverity(results.scores.pcl5Short.totalScore, "ptsd");
-  }
-  if (category === "ocd") {
-    return interpretSeverity(results.scores.miniToc.totalScore, "ocd");
-  }
-
+function categoryBand(results: AssessmentResults, category: DominantCategory): SeverityBand {
+  // IB note: prefer validated score thresholds when available for stronger psychometric traceability.
+  if (category === "depression") return interpretSeverity(results.scores.phq9.totalScore, "depression");
+  if (category === "anxiety") return interpretSeverity(results.scores.gad7.totalScore, "anxiety");
+  if (category === "trauma") return interpretSeverity(results.scores.pcl5Short.totalScore, "ptsd");
+  if (category === "ocd") return interpretSeverity(results.scores.miniToc.totalScore, "ocd");
   return interpretNormalizedSeverity(results.categoryScores[category] ?? 0);
 }
 
-function getGlobalBand(results: AssessmentResults): SeverityBand {
+function globalBand(results: AssessmentResults): SeverityBand {
   const values = Object.values(results.categoryScores);
   if (values.length === 0) return "low";
   const avg = values.reduce((sum, value) => sum + value, 0) / values.length;
@@ -47,22 +41,17 @@ function domainLabel(category: DominantCategory): string {
   return "l’attention et l’organisation";
 }
 
-function withDeContraction(phraseWithArticle: string): string {
-  if (phraseWithArticle.startsWith("le ")) {
-    return `du ${phraseWithArticle.slice(3)}`;
-  }
-  if (phraseWithArticle.startsWith("les ")) {
-    return `des ${phraseWithArticle.slice(4)}`;
-  }
-  if (phraseWithArticle.startsWith("la ")) {
-    return `de la ${phraseWithArticle.slice(3)}`;
-  }
-  return `de ${phraseWithArticle}`;
+function joinDomains(categories: DominantCategory[]): string {
+  const labels = categories.map(domainLabel);
+  if (labels.length === 0) return "";
+  if (labels.length === 1) return labels[0]!;
+  if (labels.length === 2) return `${labels[0]} et ${labels[1]}`;
+  return `${labels.slice(0, -1).join(", ")} et ${labels[labels.length - 1]}`;
 }
 
-function introductionByBand(band: SeverityBand): string {
+function introByGlobalBand(band: SeverityBand): string {
   if (band === "low") {
-    return "Merci d’avoir répondu au test. Prendre ce temps pour toi est déjà une bonne démarche.";
+    return "Merci d’avoir répondu au bilan. Prendre ce temps pour toi est déjà une bonne démarche.";
   }
   if (band === "medium") {
     return "Merci d’avoir pris le temps de répondre à l’évaluation. Le fait de réfléchir à ce que tu ressens montre que tu prends ton bien-être au sérieux.";
@@ -70,30 +59,48 @@ function introductionByBand(band: SeverityBand): string {
   return "Merci d’avoir complété l’évaluation avec sincérité. Mettre des mots sur ce que tu traverses demande du courage.";
 }
 
-function emotionalSummaryByBand(category: DominantCategory, band: SeverityBand): string {
-  const label = domainLabel(category);
-  const deLabel = withDeContraction(label);
+function emotionalSummary(categories: DominantCategory[], band: SeverityBand): string {
+  const domains = joinDomains(categories);
   if (band === "low") {
-    return `Tes réponses ne montrent pas de signes préoccupants pour ${label}.`;
+    return "Aucun signe préoccupant détecté dans ce bilan global.";
   }
   if (band === "medium") {
-    return `Tes réponses suggèrent une alerte modérée autour ${deLabel}. Cela peut rendre certaines journées plus fatigantes, mais il existe des stratégies simples pour alléger cette pression.`;
+    return categories.length > 1
+      ? `Tes réponses suggèrent une alerte modérée sur plusieurs dimensions: ${domains}. Cela peut rendre certaines journées plus fatigantes, mais des repères simples peuvent déjà t’aider.`
+      : `Tes réponses suggèrent une alerte modérée autour de ${domains}. Cela peut rendre certaines journées plus fatigantes, mais il existe des stratégies simples pour alléger cette pression.`;
   }
-  return `Tes réponses montrent une alerte forte autour ${deLabel}. Cela peut peser sur ton quotidien (école, énergie, sommeil ou relations), et c’est important de chercher du soutien.`;
+  return categories.length > 1
+    ? `Tes réponses montrent une alerte forte sur plusieurs dimensions: ${domains}. Cela peut peser sur ton quotidien, et il est important de chercher du soutien.`
+    : `Tes réponses montrent une alerte forte autour de ${domains}. Cela peut peser sur ton quotidien (école, énergie, sommeil ou relations), et c’est important de chercher du soutien.`;
 }
 
-function dominantFocusByBand(category: DominantCategory, band: SeverityBand): string {
-  const label = domainLabel(category);
-  if (band === "low") {
-    return `Ton rapport à ${label} est plutôt équilibré pour le moment.`;
+function dominantFocus(categories: DominantCategory[], band: SeverityBand): string {
+  if (categories.length === 0) {
+    return "Aucune catégorie dominante ne ressort pour le moment.";
   }
+
+  const domains = joinDomains(categories);
   if (band === "medium") {
-    return `En ce moment, ${label} semble prendre plus de place que d’habitude. Avec des habitudes régulières et du soutien, tu peux améliorer la situation progressivement.`;
+    return categories.length > 1
+      ? `Plusieurs catégories ressortent au même niveau: ${domains}. Tu peux avancer progressivement avec des habitudes régulières et du soutien.`
+      : `En ce moment, ${domains} semble prendre plus de place que d’habitude. Avec des habitudes régulières et du soutien, tu peux améliorer la situation progressivement.`;
   }
-  return `Actuellement, ${label} semble être la zone la plus sensible. À ce niveau, il est recommandé d’en parler à un adulte de confiance et, si besoin, à un professionnel.`;
+
+  return categories.length > 1
+    ? `Plusieurs catégories ressortent fortement au même niveau: ${domains}. À ce niveau, il est recommandé d’en parler à un adulte de confiance et, si besoin, à un professionnel.`
+    : `Actuellement, ${domains} semble être la zone la plus sensible. À ce niveau, il est recommandé d’en parler à un adulte de confiance et, si besoin, à un professionnel.`;
 }
 
-function psychoeducationByCategory(category: DominantCategory): string {
+function psychoeducation(categories: DominantCategory[]): string {
+  if (categories.length === 0) {
+    return "À l’adolescence, les émotions peuvent varier selon le sommeil, l’école, les relations et le stress du moment. Ces variations sont fréquentes. Continuer à observer ton bien-être reste une bonne habitude.";
+  }
+
+  if (categories.length > 1) {
+    return "À l’adolescence, plusieurs dimensions du bien-être peuvent se chevaucher en même temps (école, relations, fatigue, stress). Ce mélange est fréquent et ne veut pas dire que “tout va mal”. Comprendre ces signaux aide à mieux s’organiser et à demander du soutien au bon moment.";
+  }
+
+  const category = categories[0]!;
   if (category === "depression") {
     return "À l’adolescence, les émotions peuvent varier fortement à cause des changements scolaires, sociaux et corporels. Une baisse d’énergie ou de motivation peut apparaître dans les périodes de pression. Ce type de ressenti est plus fréquent qu’on ne le pense.";
   }
@@ -115,41 +122,34 @@ function psychoeducationByCategory(category: DominantCategory): string {
   return "Chaque cerveau a son rythme de fonctionnement. Certaines personnes ont besoin de stratégies plus structurées pour l’attention, l’organisation et la régulation. Avec les bons outils, le quotidien peut devenir plus simple.";
 }
 
-function recommendationsByBand(category: DominantCategory, band: SeverityBand): string[] {
-  const sharedLow = [
-    "Garde un rythme de sommeil régulier autant que possible.",
-    "Bouge un peu chaque jour pour relâcher la tension.",
-    "Parle de ce que tu ressens à un adulte de confiance quand tu en as besoin.",
-    "Continue des activités qui te font du bien et te recentrent.",
-  ];
-
-  if (band === "low") {
-    return sharedLow;
+function recommendations(categories: DominantCategory[], band: SeverityBand): string[] {
+  if (band === "low" || categories.length === 0) {
+    return [
+      "Garde un rythme de sommeil régulier autant que possible.",
+      "Bouge un peu chaque jour pour entretenir ton équilibre.",
+      "Continue des activités qui te font du bien.",
+      "Parle à un adulte de confiance si quelque chose te préoccupe.",
+    ];
   }
 
   if (band === "medium") {
     return [
-      "Garde des repères simples: sommeil, repas, pauses, mouvement.",
+      "Garde des repères simples: sommeil, repas, pauses et mouvement.",
       "Quand une difficulté arrive, écris ce que tu ressens puis une petite action possible.",
       "Évite de rester seul·e avec la pression: parle à un adulte de confiance.",
       "Si cela dure, demander l’avis d’un professionnel peut t’aider à avancer plus vite.",
     ];
   }
 
-  const domainSpecific =
-    category === "anxiety"
-      ? "Teste une respiration lente (ex: inspire 4 secondes, expire 6 secondes) plusieurs fois par jour."
-      : "Essaie de garder une petite structure de journée, même quand c’est difficile.";
-
   return [
-    domainSpecific,
+    "Essaie de garder une petite structure de journée, même quand c’est difficile.",
     "Parle rapidement à un adulte de confiance pour ne pas rester seul·e avec ça.",
     "Demande un soutien professionnel pour apprendre des outils adaptés à ta situation.",
     "En cas de détresse importante, cherche de l’aide sans attendre.",
   ];
 }
 
-function encouragementByBand(band: SeverityBand): string {
+function encouragement(band: SeverityBand): string {
   if (band === "low") {
     return "Tu as déjà fait un pas utile. Continue à prendre soin de toi.";
   }
@@ -160,20 +160,27 @@ function encouragementByBand(band: SeverityBand): string {
 }
 
 export function generateNaturalReport(results: AssessmentResults): NaturalReport {
-  // IB note: full report is deterministic and generated server-side from scored data only.
-  const dominantBand = getDominantBand(results);
-  const globalBand = getGlobalBand(results);
-  const category = results.dominantCategory;
+  // IB note: deterministic server-side generation from scored data only.
+  const gBand = globalBand(results);
+  const categories = results.dominantCategories;
 
-  // IB note: section tone follows real score bands (low/medium/high) to guarantee
-  // consistency between psychometric signal and narrative feedback.
+  let dBand: SeverityBand = "low";
+  for (const category of categories) {
+    const candidate = categoryBand(results, category);
+    if (SEVERITY_WEIGHT[candidate] > SEVERITY_WEIGHT[dBand]) {
+      dBand = candidate;
+    }
+  }
+
+  const effectiveBand = categories.length === 0 ? "low" : dBand;
+
   return {
-    introduction: introductionByBand(globalBand),
-    emotionalSummary: emotionalSummaryByBand(category, dominantBand),
-    dominantFocus: dominantFocusByBand(category, dominantBand),
-    psychoeducation: psychoeducationByCategory(category),
-    recommendations: recommendationsByBand(category, dominantBand),
-    encouragement: encouragementByBand(dominantBand),
+    introduction: introByGlobalBand(gBand),
+    emotionalSummary: emotionalSummary(categories, effectiveBand),
+    dominantFocus: dominantFocus(categories, effectiveBand),
+    psychoeducation: psychoeducation(categories),
+    recommendations: recommendations(categories, effectiveBand),
+    encouragement: encouragement(effectiveBand),
     ethicalNotice:
       "Ce bilan n’est pas un diagnostic médical. Il sert uniquement à mieux comprendre ce que tu traverses et à ouvrir la discussion avec un adulte ou un professionnel si besoin.",
   };

@@ -9,6 +9,9 @@ import { questionnaireRegistry } from "@/features/assessment/schemas";
 import { enforceRateLimit } from "@/lib/security/rateLimit";
 import { bilanPayloadSchema } from "@/lib/validation/bilan";
 
+const GLOBAL_SCREENING_THRESHOLD = 0.2;
+const CATEGORY_SCREENING_THRESHOLD = 0.2;
+
 function normalizeScreen(answers: number[], maxPerItem: number): number {
   const maxScore = answers.length * maxPerItem;
   if (maxScore === 0) {
@@ -86,9 +89,21 @@ export async function POST(request: Request) {
       neurodevelopment: neurodevScreen,
     };
 
-    const dominantCategory = (Object.entries(dominantMap).sort(
-      (a, b) => b[1] - a[1]
-    )[0]?.[0] ?? "depression") as DominantCategory;
+    const globalScore =
+      Object.values(dominantMap).reduce((sum, value) => sum + value, 0) /
+      Object.values(dominantMap).length;
+
+    const ranked = Object.entries(dominantMap).sort((a, b) => b[1] - a[1]);
+    const topScore = ranked[0]?.[1] ?? 0;
+
+    const dominantCategories: DominantCategory[] =
+      globalScore < GLOBAL_SCREENING_THRESHOLD || topScore < CATEGORY_SCREENING_THRESHOLD
+        ? []
+        : ranked
+            .filter(([, value]) => Math.abs(value - topScore) < 1e-9)
+            .map(([key]) => key as DominantCategory);
+
+    const dominantCategory = dominantCategories[0] ?? null;
 
     const results: AssessmentResults = {
       scores: {
@@ -98,6 +113,7 @@ export async function POST(request: Request) {
         miniToc,
       },
       categoryScores: dominantMap,
+      dominantCategories,
       dominantCategory,
     };
 
@@ -109,6 +125,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         results,
+        dominantCategories,
         dominantCategory,
         naturalReport,
         // Backward-compatible aliases to avoid breaking existing frontend code during migration.
