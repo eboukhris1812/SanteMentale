@@ -1,3 +1,5 @@
+const siteOwnerName = "Elyes Boukhris élève à l'Ecole Canadienne de Tunis";
+
 export default function AProposPage() {
   return (
     <section className="animate-fade-up space-y-6">
@@ -49,6 +51,12 @@ export default function AProposPage() {
           </p>
         </div>
       </article>
+
+      <section className="surface-card rounded-3xl p-6 md:p-8">
+        <p className="text-sm font-semibold text-slate-800 md:text-base">
+          Propriétaire du site: {siteOwnerName}
+        </p>
+      </section>
     </section>
   );
 }
