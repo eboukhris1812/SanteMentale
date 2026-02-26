@@ -1,14 +1,18 @@
-﻿export type SeverityLevel =
+export type SeverityLevel =
   | "minimal"
   | "mild"
   | "moderate"
-  | "moderately-severe"
-  | "severe"
+  | "moderately-sévère"
+  | "sévère"
   | "positive-screen";
 
 export type QuestionnaireItem = {
   id: string;
   prompt: string;
+  // Some instruments have item-specific response ceilings (e.g., BES items with 3 options).
+  maxOption?: number;
+  // Optional item-specific option labels keyed by numeric score.
+  choices?: Record<number, string>;
 };
 
 export type QuestionnaireScale = {
@@ -18,7 +22,18 @@ export type QuestionnaireScale = {
 };
 
 export type ScoringRules = {
-  method: "sum";
+  method:
+    | "sum"
+    | "aq10-keyed-binary"
+    | "mdq-official"
+    | "pdss-sr-official"
+    | "agoraphobia-severity-10"
+    | "lsas-sr-official"
+    | "ygtss-global"
+    | "eat26-official"
+    | "bes-official"
+    | "pcl5-official"
+    | "rada-dsm5-split";
   requiredItems: number;
   // Scientific provenance for IB report/audit.
   source: string;
@@ -55,5 +70,6 @@ export type QuestionnaireScore = {
   totalScore: number;
   maxScore: number;
   normalizedScore: number;
+  components?: Record<string, number>;
   interpretation: InterpretationResult;
 };

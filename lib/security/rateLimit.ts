@@ -1,4 +1,4 @@
-﻿export type RateLimitResult = {
+export type RateLimitResult = {
   allowed: boolean;
   remaining: number;
   resetInSeconds: number;

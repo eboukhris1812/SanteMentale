@@ -26,7 +26,7 @@ export default function Resultats() {
 
   const pondérations: Scores = {
     humeur: 1.2,
-    anxiete: 1.1,
+    anxiété: 1.1,
     sommeil: 1.0,
     estime: 1.0,
     stress: 1.1,

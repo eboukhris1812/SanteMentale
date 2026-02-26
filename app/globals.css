@@ -26,8 +26,10 @@ body {
 }
 
 /* Keep long educational text blocks justified consistently across all pages. */
-p {
+main p,
+main li {
   text-align: justify;
+  text-justify: inter-word;
 }
 
 /* Subtle layered backdrop to avoid flat pages while keeping strong readability. */

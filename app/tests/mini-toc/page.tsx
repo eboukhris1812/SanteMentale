@@ -1,4 +1,4 @@
-﻿import SpecificTestRunner from "@/components/SpecificTestRunner";
+import SpecificTestRunner from "@/components/SpecificTestRunner";
 
 type RawSearchParams = Record<string, string | string[] | undefined>;
 

@@ -1,4 +1,4 @@
-﻿import {
+import {
   type InterpretationResult,
   type QuestionnaireDefinition,
   type Threshold,

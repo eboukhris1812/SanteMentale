@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -86,8 +86,8 @@ const orientationMap: Record<
     troubleSheetHref: "/categories/troubles-anxieux",
   },
   trauma: {
-    specificTestName: "PCL-5 court",
-    specificTestHref: "/tests/pcl5-court",
+    specificTestName: "PCL-5 (20 items)",
+    specificTestHref: "/tests/pcl5",
     troubleSheetHref: "/troubles/tspt",
   },
   ocd: {
@@ -96,17 +96,17 @@ const orientationMap: Record<
     troubleSheetHref: "/troubles/toc",
   },
   personality: {
-    specificTestName: "PDQ-4+ (Groupe A) - à venir",
-    specificTestHref: "/tests/pdq4-groupe-a",
+    specificTestName: "SAPAS (tri initial personnalité)",
+    specificTestHref: "/tests/sapas",
     troubleSheetHref: "/categories/troubles-personnalite",
   },
   eating: {
-    specificTestName: "EAT-26 - à venir",
+    specificTestName: "EAT-26",
     specificTestHref: "/tests/eat26",
     troubleSheetHref: "/categories/troubles-conduites-alimentaires",
   },
   neurodevelopment: {
-    specificTestName: "ASRS v1.1 - à venir",
+    specificTestName: "ASRS v1.1 (18 items)",
     specificTestHref: "/tests/asrs-v11",
     troubleSheetHref: "/categories/troubles-neurodeveloppementaux",
   },

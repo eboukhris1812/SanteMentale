@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { scoreQuestionnaire } from "@/features/assessment/engine";
 import { questionnaireRegistry } from "@/features/assessment/schemas";
 import { enforceRateLimit } from "@/lib/security/rateLimit";
@@ -108,12 +108,12 @@ export async function POST(request: Request) {
         categoryScores: dominantMap,
         dominantCategory,
         methodology: {
-          framework: "Depistage psychometrique educatif pour projet academique IB",
+          framework: "dépistage psychométrique éducatif pour projet academique IB",
           scoringMethod:
             "Somme simple des items calculee cote serveur (questionnaires valides + ecrans d'orientation categories).",
           ageTarget: "Adolescents 14-18 ans",
           limitations: [
-            "Outil de depistage uniquement: ne pose pas de diagnostic clinique.",
+            "Outil de dépistage uniquement: ne pose pas de diagnostic clinique.",
             "Les seuils peuvent varier selon la population, la langue et le contexte.",
             "PCL-5 court et Mini-TOC (style OCI-4) sont indicatifs et non diagnostiques seuls.",
             "Personnalite, conduites alimentaires et neurodeveloppement sont actuellement estimes par des ecrans d'orientation courts.",
@@ -121,7 +121,7 @@ export async function POST(request: Request) {
           sources: [
             "PHQ-9: Kroenke K, Spitzer RL, Williams JBW. J Gen Intern Med. 2001;16(9):606-613.",
             "GAD-7: Spitzer RL, Kroenke K, Williams JBW, Lowe B. Arch Intern Med. 2006;166(10):1092-1097.",
-            "PCL-5 (20 items): recommandations VA/NCPTSD; seuils courts variables selon les etudes.",
+            "PCL-5 (20 items): recommandations VA/NCPTSD; seuils courts variables selon les études.",
             "OCI-4 court: Abramovitch A et al. J Obsessive Compuls Relat Disord. 2021;31:100696.",
           ],
         },
@@ -132,7 +132,7 @@ export async function POST(request: Request) {
           urgentSupportRecommended,
           urgentSupportReason:
             urgentSupportRecommended
-              ? "L'item 9 du PHQ-9 est superieur a 0: parle rapidement a un adulte de confiance ou a un professionnel de sante."
+              ? "L'item 9 du PHQ-9 est superieur a 0: parle rapidement a un adulte de confiance ou a un professionnel de santé."
               : "Aucun signal critique immediat detecte sur l'item 9 du PHQ-9.",
         },
       },
@@ -160,3 +160,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

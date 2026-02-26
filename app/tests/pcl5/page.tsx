@@ -8,7 +8,7 @@ function normalizeParam(value: string | string[] | undefined): string | null {
   return null;
 }
 
-export default async function TestPhq9Page({
+export default async function TestPcl5Page({
   searchParams,
 }: {
   searchParams?: Promise<RawSearchParams>;
@@ -20,10 +20,10 @@ export default async function TestPhq9Page({
 
   return (
     <SpecificTestRunner
-      title="Test spécifique : PHQ-9"
-      description="Auto-évaluation orientée dépression (outil éducatif, non diagnostique)."
-      testId="phq9"
-      apiPath="/api/tests/phq9"
+      title="Test spécifique : PCL-5 (20 items)"
+      description="Auto-évaluation orientée trouble de stress post-traumatique (outil éducatif, non diagnostique)."
+      testId="pcl5"
+      apiPath="/api/tests/pcl5"
       recommendation={{
         fromBilanGlobal: source === "bilan-global" && recommended === "1",
         dominant,
@@ -31,3 +31,4 @@ export default async function TestPhq9Page({
     />
   );
 }
+

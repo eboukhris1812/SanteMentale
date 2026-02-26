@@ -1,4 +1,4 @@
-﻿import { z } from "zod";
+import { z } from "zod";
 
 const phq9AnswersSchema = z.array(z.number().int().min(0).max(3)).length(9);
 const gad7AnswersSchema = z.array(z.number().int().min(0).max(3)).length(7);

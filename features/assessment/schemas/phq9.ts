@@ -1,4 +1,4 @@
-﻿import {
+import {
   type InterpretationResult,
   type QuestionnaireDefinition,
   type Threshold,
@@ -30,14 +30,14 @@ const thresholds: readonly Threshold[] = [
     min: 15,
     max: 19,
     label: "Dépression modérée à sévère",
-    severity: "moderately-severe",
+    severity: "moderately-sévère",
     clinicalMeaning: "Charge symptomatique élevée; suivi clinique actif recommandé.",
   },
   {
     min: 20,
     max: 27,
     label: "Dépression sévère",
-    severity: "severe",
+    severity: "sévère",
     clinicalMeaning: "Charge symptomatique très élevée; évaluation clinique rapide recommandée.",
   },
 ];

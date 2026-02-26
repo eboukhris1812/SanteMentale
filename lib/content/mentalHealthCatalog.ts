@@ -1,4 +1,4 @@
-﻿export type TestStatus = "implemented" | "adapted" | "planned" | "undefined";
+export type TestStatus = "implemented" | "adapted" | "planned" | "undefined";
 
 export type TroubleTest = {
   slug: string;
@@ -99,7 +99,13 @@ export const troubles: Trouble[] = [
     summary: "Attaques de panique récurrentes avec peur anticipatoire de nouvelles crises.",
     signs: ["Crises soudaines de peur intense", "Palpitations, dyspnée, vertiges", "Évitement de situations par peur"],
     orientation: ["Explication du cycle panique", "Techniques respiratoires", "Évaluation clinique spécialisée"],
-    test: { slug: "pdss-sr", code: "PDSS-SR", name: "Panic Disorder Severity Scale", status: "adapted" },
+    test: {
+      slug: "pdss-sr",
+      code: "PDSS-SR",
+      name: "Severity Measure for Panic Disorder",
+      status: "implemented",
+      notes: "Format DSM-5 10 items (0-4, 7 derniers jours), score brut 0-40 + score moyen 0-4.",
+    },
   },
   {
     slug: "agoraphobie",
@@ -108,7 +114,13 @@ export const troubles: Trouble[] = [
     summary: "Peur marquée des lieux ou situations où s'échapper serait difficile.",
     signs: ["Évitement des transports/espaces publics", "Dépendance à l'accompagnement", "Détresse anticipatoire"],
     orientation: ["Travail progressif d'exposition", "Réduction de l'évitement", "Accompagnement thérapeutique"],
-    test: { slug: "pas", code: "PAS", name: "Panic and Agoraphobia Scale", status: "adapted" },
+    test: {
+      slug: "pas",
+      code: "PAS",
+      name: "Severity Measure for Agoraphobia",
+      status: "implemented",
+      notes: "Format DSM-5 10 items (0-4, 7 derniers jours), score brut 0-40 + score moyen 0-4.",
+    },
   },
   {
     slug: "phobie-sociale",
@@ -117,7 +129,13 @@ export const troubles: Trouble[] = [
     summary: "Peur persistante d'être jugé négativement en situation sociale.",
     signs: ["Évitement de prises de parole", "Crainte du regard des autres", "Retrait social progressif"],
     orientation: ["Restructuration des pensées sociales", "Expositions graduées", "Soutien psychologique"],
-    test: { slug: "lsas", code: "LSAS", name: "Liebowitz Social Anxiety Scale", status: "adapted" },
+    test: {
+      slug: "lsas",
+      code: "LSAS-SR",
+      name: "Liebowitz Social Anxiety Scale - Self Report",
+      status: "implemented",
+      notes: "Structure complète 24 situations x peur + évitement (48 réponses), score total 0-144.",
+    },
   },
   {
     slug: "phobies-specifiques",
@@ -129,8 +147,9 @@ export const troubles: Trouble[] = [
     test: {
       slug: "fasc",
       code: "FASC",
-      name: "Fear Survey Schedule (ou questionnaire personnalisé)",
-      status: "adapted",
+      name: "Fear Survey (52 items)",
+      status: "implemented",
+      notes: "Version 52 items (échelle 1-5) avec interprétation par plages indicatives.",
     },
   },
 
@@ -150,7 +169,13 @@ export const troubles: Trouble[] = [
     summary: "Alternance d'épisodes maniaques (ou mixtes) et dépressifs.",
     signs: ["Périodes d'euphorie/irritabilité marquées", "Réduction du besoin de sommeil", "Conduites à risque"],
     orientation: ["Repérage des épisodes thymiques", "Évaluation psychiatrique spécialisée", "Suivi longitudinal"],
-    test: { slug: "mdq", code: "MDQ", name: "Mood Disorder Questionnaire", status: "adapted", notes: "Utilisé aussi pour type II et cyclothymique." },
+    test: {
+      slug: "mdq",
+      code: "MDQ",
+      name: "Mood Disorder Questionnaire",
+      status: "implemented",
+      notes: "Scoring officiel MDQ: >=7 (items 1-13) + simultanéité (item 14=Oui) + retentissement modéré/sérieux (item 15). Utilisé aussi pour type II et cyclothymique.",
+    },
   },
   {
     slug: "bipolaire-type-2",
@@ -159,7 +184,13 @@ export const troubles: Trouble[] = [
     summary: "Association d'épisodes dépressifs et d'épisodes hypomaniaques.",
     signs: ["Fluctuations marquées d'énergie", "Périodes d'activation inhabituelle", "Retentissement fonctionnel"],
     orientation: ["Anamnèse des phases d'humeur", "Différenciation avec dépression unipolaire", "Orientation spécialisée"],
-    test: { slug: "mdq", code: "MDQ", name: "Mood Disorder Questionnaire", status: "adapted" },
+    test: {
+      slug: "mdq",
+      code: "MDQ",
+      name: "Mood Disorder Questionnaire",
+      status: "implemented",
+      notes: "Scoring officiel MDQ avec critères A/B/C (dépistage, non diagnostique).",
+    },
   },
   {
     slug: "trouble-cyclothymique",
@@ -168,7 +199,13 @@ export const troubles: Trouble[] = [
     summary: "Instabilité chronique de l'humeur avec symptômes hypomaniaques et dépressifs sous-seuil.",
     signs: ["Oscillations thymiques fréquentes", "Variabilité émotionnelle durable", "Impact relationnel"],
     orientation: ["Suivi de l'évolution dans le temps", "Hygiène de vie et rythmes", "Évaluation spécialisée"],
-    test: { slug: "mdq", code: "MDQ", name: "Mood Disorder Questionnaire", status: "adapted" },
+    test: {
+      slug: "mdq",
+      code: "MDQ",
+      name: "Mood Disorder Questionnaire",
+      status: "implemented",
+      notes: "Scoring officiel MDQ avec critères A/B/C (dépistage, non diagnostique).",
+    },
   },
 
   {
@@ -179,11 +216,11 @@ export const troubles: Trouble[] = [
     signs: ["Flashbacks ou cauchemars", "Évitement des rappels", "Hypervigilance"],
     orientation: ["Sécurisation immédiate", "Évaluation spécialisée trauma", "Soutien psychothérapeutique"],
     test: {
-      slug: "pcl5-court",
+      slug: "pcl5",
       code: "PCL-5",
       name: "PTSD Checklist for DSM-5",
-      status: "adapted",
-      notes: "Version courte actuellement implémentée: PCL-5 court.",
+      status: "implemented",
+      notes: "Version complète officielle (20 items, dernier mois).",
     },
   },
   {
@@ -193,7 +230,13 @@ export const troubles: Trouble[] = [
     summary: "Symptômes post-traumatiques précoces dans le mois suivant l'événement.",
     signs: ["Intrusions", "Anesthésie émotionnelle", "Hyperréactivité"],
     orientation: ["Surveillance rapprochée", "Intervention précoce", "Réévaluation à distance"],
-    test: { slug: "sasds", code: "SASDS", name: "Stanford Acute Stress Reaction Questionnaire (SASDS)", status: "adapted" },
+    test: {
+      slug: "sasds",
+      code: "SASDS",
+      name: "SASDS/ASDS (Stanford/Bryant acute stress screening)",
+      status: "implemented",
+      notes: "Version alignée dépistage stress aigu (19 items, échelle 1-5, cut-off usuel >=56).",
+    },
   },
   {
     slug: "attachement-reactionnel",
@@ -202,7 +245,13 @@ export const troubles: Trouble[] = [
     summary: "Difficultés relationnelles majeures liées à des expériences précoces de négligence/carence.",
     signs: ["Retrait social", "Faible recherche de réconfort", "Réactivité émotionnelle atypique"],
     orientation: ["Évaluation développementale", "Approche pluridisciplinaire", "Travail avec les figures d'attachement"],
-    test: { slug: "rada", code: "RADA", name: "Reactive Attachment Disorder Assessment", status: "adapted" },
+    test: {
+      slug: "rada",
+      code: "RADA",
+      name: "Reactive Attachment Disorder Assessment",
+      status: "adapted",
+      notes: "Parent-report 17 items (Hall, 2009; base DSM-IV) avec sortie adaptée RAD/DSED pour orientation DSM-5. Confirmation clinique multi-source indispensable.",
+    },
   },
 
   {
@@ -212,7 +261,7 @@ export const troubles: Trouble[] = [
     summary: "Méfiance envahissante et interprétation hostile des intentions d'autrui.",
     signs: ["Soupçons persistants", "Hypervigilance interpersonnelle", "Rigidité relationnelle"],
     orientation: ["Évaluation clinique spécialisée", "Alliance thérapeutique prudente", "Travail sur les cognitions"],
-    test: { slug: "pdq4-groupe-a", code: "PDQ-4+", name: "Section Groupe A", status: "adapted" },
+    test: { slug: "pdq4-groupe-a", code: "PDQ-4+", name: "Section Groupe A", status: "adapted", notes: "Section de repérage issue du PDQ-4+ (version complète: 99 items Vrai/Faux). Parcours recommandé: SAPAS puis PDQ-4+ complet." },
   },
   {
     slug: "personnalite-antisociale",
@@ -221,7 +270,7 @@ export const troubles: Trouble[] = [
     summary: "Transgression répétée des normes et faible prise en compte d'autrui.",
     signs: ["Impulsivité", "Comportements à risque", "Manque de remords"],
     orientation: ["Évaluation spécialisée", "Cadre thérapeutique structuré", "Travail sur la régulation comportementale"],
-    test: { slug: "pdq4-groupe-b", code: "PDQ-4+", name: "Section Groupe B", status: "adapted" },
+    test: { slug: "pdq4-groupe-b", code: "PDQ-4+", name: "Section Groupe B", status: "adapted", notes: "Section de repérage issue du PDQ-4+ (version complète: 99 items Vrai/Faux). Parcours recommandé: SAPAS puis PDQ-4+ complet." },
   },
   {
     slug: "personnalite-borderline",
@@ -230,7 +279,7 @@ export const troubles: Trouble[] = [
     summary: "Instabilité émotionnelle, relationnelle et identitaire importante.",
     signs: ["Variations émotionnelles intenses", "Peur de l'abandon", "Impulsivité"],
     orientation: ["Repérage du risque auto-agressif", "Approches validées (ex: TCD)", "Suivi spécialisé"],
-    test: { slug: "pdq4-groupe-b", code: "PDQ-4+", name: "Section Groupe B", status: "adapted" },
+    test: { slug: "pdq4-groupe-b", code: "PDQ-4+", name: "Section Groupe B", status: "adapted", notes: "Section de repérage issue du PDQ-4+ (version complète: 99 items Vrai/Faux). Parcours recommandé: SAPAS puis PDQ-4+ complet." },
   },
   {
     slug: "personnalite-evitante",
@@ -239,7 +288,7 @@ export const troubles: Trouble[] = [
     summary: "Inhibition sociale marquée et hypersensibilité au jugement négatif.",
     signs: ["Évitement relationnel", "Sentiment d'infériorité", "Peur de la critique"],
     orientation: ["Exposition sociale progressive", "Travail cognitif", "Soutien psychothérapeutique"],
-    test: { slug: "pdq4-groupe-c", code: "PDQ-4+", name: "Section Groupe C", status: "adapted" },
+    test: { slug: "pdq4-groupe-c", code: "PDQ-4+", name: "Section Groupe C", status: "adapted", notes: "Section de repérage issue du PDQ-4+ (version complète: 99 items Vrai/Faux). Parcours recommandé: SAPAS puis PDQ-4+ complet." },
   },
   {
     slug: "personnalite-dependante",
@@ -248,7 +297,7 @@ export const troubles: Trouble[] = [
     summary: "Besoin excessif d'être pris en charge, avec difficulté d'autonomie décisionnelle.",
     signs: ["Recherche constante de réassurance", "Difficulté à décider seul", "Crainte de séparation"],
     orientation: ["Renforcement de l'autonomie", "Travail assertif", "Accompagnement spécialisé"],
-    test: { slug: "pdq4-groupe-c", code: "PDQ-4+", name: "Section Groupe C", status: "adapted" },
+    test: { slug: "pdq4-groupe-c", code: "PDQ-4+", name: "Section Groupe C", status: "adapted", notes: "Section de repérage issue du PDQ-4+ (version complète: 99 items Vrai/Faux). Parcours recommandé: SAPAS puis PDQ-4+ complet." },
   },
 
   {
@@ -258,7 +307,7 @@ export const troubles: Trouble[] = [
     summary: "Restriction alimentaire persistante et peur intense de prendre du poids.",
     signs: ["Perte de poids", "Contrôle alimentaire strict", "Distorsion de l'image corporelle"],
     orientation: ["Évaluation somatique et psychique", "Prise en charge pluridisciplinaire", "Suivi nutritionnel"],
-    test: { slug: "eat26", code: "EAT-26", name: "Eating Attitudes Test-26", status: "adapted", notes: "Aussi utilisé pour la boulimie." },
+    test: { slug: "eat26", code: "EAT-26", name: "Eating Attitudes Test-26", status: "implemented", notes: "Scoring officiel EAT-26 (seuil >= 20); aussi utilisé pour la boulimie." },
   },
   {
     slug: "boulimie",
@@ -267,7 +316,7 @@ export const troubles: Trouble[] = [
     summary: "Épisodes d'hyperphagie avec comportements compensatoires répétés.",
     signs: ["Crises alimentaires", "Vomissements/compensations", "Honte post-crise"],
     orientation: ["Repérage de la fréquence des crises", "Approche TCC spécialisée", "Suivi nutritionnel et médical"],
-    test: { slug: "eat26", code: "EAT-26", name: "Eating Attitudes Test-26", status: "adapted" },
+    test: { slug: "eat26", code: "EAT-26", name: "Eating Attitudes Test-26", status: "implemented", notes: "Scoring officiel EAT-26 (seuil >= 20)." },
   },
   {
     slug: "hyperphagie-boulimique",
@@ -276,7 +325,7 @@ export const troubles: Trouble[] = [
     summary: "Crises alimentaires récurrentes sans comportements compensatoires réguliers.",
     signs: ["Manger rapidement en grande quantité", "Perte de contrôle", "Détresse associée"],
     orientation: ["Évaluation des déclencheurs émotionnels", "Intervention psycho-nutritionnelle", "Suivi spécialisé"],
-    test: { slug: "bes", code: "BES", name: "Binge Eating Scale", status: "adapted" },
+    test: { slug: "bes", code: "BES", name: "Binge Eating Scale", status: "implemented", notes: "Scoring officiel BES (0-46; seuils <=17, 18-26, >=27)." },
   },
 
   {
@@ -286,7 +335,7 @@ export const troubles: Trouble[] = [
     summary: "Difficultés d'attention et/ou hyperactivité-impulsivité persistantes.",
     signs: ["Inattention", "Agitation motrice", "Impulsivité"],
     orientation: ["Évaluation neurodéveloppementale", "Adaptations scolaires", "Approche multimodale"],
-    test: { slug: "asrs-v11", code: "ASRS v1.1", name: "Adult ADHD Self-Report Scale v1.1 (adaptation prudente)", status: "adapted" },
+    test: { slug: "asrs-v11", code: "ASRS v1.1", name: "Adult ADHD Self-Report Scale v1.1 (18 items)", status: "implemented", notes: "Scoring officiel ASRS-18 (0-72), sans cutoff universel diagnostique." },
   },
   {
     slug: "tsa",
@@ -295,7 +344,7 @@ export const troubles: Trouble[] = [
     summary: "Particularités durables de la communication sociale et des comportements restreints/répétitifs.",
     signs: ["Difficultés sociales", "Intérêts restreints", "Rigidités comportementales"],
     orientation: ["Bilan spécialisé TSA", "Soutien psychoéducatif", "Adaptations de l'environnement"],
-    test: { slug: "aq10", code: "AQ-10", name: "Autism Spectrum Quotient-10", status: "adapted" },
+    test: { slug: "aq10", code: "AQ-10", name: "Autism Spectrum Quotient-10", status: "implemented", notes: "Scoring officiel AQ-10 (seuil >= 6, dépistage)." },
   },
   {
     slug: "gilles-tourette",
@@ -304,7 +353,7 @@ export const troubles: Trouble[] = [
     summary: "Présence de tics moteurs et vocaux évoluant dans le temps.",
     signs: ["Tics moteurs", "Tics vocaux", "Variabilité selon stress/fatigue"],
     orientation: ["Évaluation neurologique/psychiatrique", "Psychoéducation", "Prise en charge adaptée"],
-    test: { slug: "ygtss", code: "YGTSS", name: "Yale Global Tic Severity Scale", status: "adapted" },
+    test: { slug: "ygtss", code: "YGTSS", name: "Yale Global Tic Severity Scale", status: "adapted", notes: "Modèle global conforme (0-100) avec adaptation auto-rapport; version clinicien recommandée en pratique." },
   },
 ];
 

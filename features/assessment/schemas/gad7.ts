@@ -1,4 +1,4 @@
-﻿import {
+import {
   type InterpretationResult,
   type QuestionnaireDefinition,
   type Threshold,
@@ -30,7 +30,7 @@ const thresholds: readonly Threshold[] = [
     min: 15,
     max: 21,
     label: "Anxiété sévère",
-    severity: "severe",
+    severity: "sévère",
     clinicalMeaning: "Charge symptomatique élevée; suivi clinique recommandé.",
   },
 ];
@@ -58,41 +58,41 @@ export const gad7Definition: QuestionnaireDefinition = {
   items: [
     {
       id: "gad7_1",
-      prompt: "Ces 7 derniers jours, t'es-tu senti(e) nerveux(se), anxieux(se) ou à bout ?",
+      prompt: "Au cours des 2 dernières semaines, t'es-tu senti(e) nerveux(se), anxieux(se) ou à bout ?",
     },
     {
       id: "gad7_2",
-      prompt: "Ces 7 derniers jours, as-tu eu du mal à arrêter de t'inquiéter ?",
+      prompt: "Au cours des 2 dernières semaines, as-tu eu du mal à arrêter de t'inquiéter ?",
     },
     {
       id: "gad7_3",
-      prompt: "Ces 7 derniers jours, t'es-tu trop inquiété(e) pour plusieurs choses à la fois ?",
+      prompt: "Au cours des 2 dernières semaines, t'es-tu trop inquiété(e) pour plusieurs choses à la fois ?",
     },
     {
       id: "gad7_4",
-      prompt: "Ces 7 derniers jours, as-tu eu du mal à te détendre ?",
+      prompt: "Au cours des 2 dernières semaines, as-tu eu du mal à te détendre ?",
     },
     {
       id: "gad7_5",
-      prompt: "Ces 7 derniers jours, t'es-tu senti(e) tellement agité(e) qu'il était difficile de rester en place ?",
+      prompt: "Au cours des 2 dernières semaines, t'es-tu senti(e) tellement agité(e) qu'il était difficile de rester en place ?",
     },
     {
       id: "gad7_6",
-      prompt: "Ces 7 derniers jours, as-tu été facilement irritable ou énervé(e) ?",
+      prompt: "Au cours des 2 dernières semaines, as-tu été facilement irritable ou énervé(e) ?",
     },
     {
       id: "gad7_7",
-      prompt: "Ces 7 derniers jours, as-tu eu peur que quelque chose de grave arrive ?",
+      prompt: "Au cours des 2 dernières semaines, as-tu eu peur que quelque chose de grave arrive ?",
     },
   ],
   scale: {
     min: 0,
     max: 3,
     anchors: {
-      0: "Jamais (0 jour)",
-      1: "Rarement (1 à 2 jours)",
-      2: "Souvent (3 à 4 jours)",
-      3: "Très souvent (5 à 7 jours)",
+      0: "Pas du tout",
+      1: "Plusieurs jours",
+      2: "Plus de la moitié des jours",
+      3: "Presque tous les jours",
     },
   },
   scoringRules: {
