@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -344,26 +344,23 @@ export default function Resultats() {
 
       <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3">
         <p className="font-semibold text-emerald-900">Synthèse de ton évaluation</p>
+        <p className="text-sm text-emerald-950">{result.naturalReport.introduction}</p>
         <div className="space-y-1">
-          <p className="text-sm font-semibold text-emerald-900">1. Introduction</p>
-          <p className="text-sm text-emerald-950">{result.naturalReport.introduction}</p>
-        </div>
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-emerald-900">2. Résumé émotionnel</p>
+          <p className="text-sm font-semibold text-emerald-900">Résumé émotionnel</p>
           <p className="text-sm text-emerald-950">{result.naturalReport.emotionalSummary}</p>
         </div>
         <div className="space-y-1">
           <p className="text-sm font-semibold text-emerald-900">
-            3. Focus sur la catégorie dominante
+            Focus sur la catégorie dominante
           </p>
           <p className="text-sm text-emerald-950">{result.naturalReport.dominantFocus}</p>
         </div>
         <div className="space-y-1">
-          <p className="text-sm font-semibold text-emerald-900">4. Psychoéducation</p>
+          <p className="text-sm font-semibold text-emerald-900">Psychoéducation</p>
           <p className="text-sm text-emerald-950">{result.naturalReport.psychoeducation}</p>
         </div>
         <div>
-          <p className="text-sm font-semibold text-emerald-900 mb-1">5. Recommandations</p>
+          <p className="text-sm font-semibold text-emerald-900 mb-1">Recommandations</p>
           <ul className="list-disc pl-5 space-y-1 text-sm text-emerald-950">
             {result.naturalReport.recommendations.map((item) => (
               <li key={item}>{item}</li>
@@ -371,11 +368,11 @@ export default function Resultats() {
           </ul>
         </div>
         <div className="space-y-1">
-          <p className="text-sm font-semibold text-emerald-900">6. Encouragement</p>
+          <p className="text-sm font-semibold text-emerald-900">Encouragement</p>
           <p className="text-sm text-emerald-950">{result.naturalReport.encouragement}</p>
         </div>
         <div className="space-y-1">
-          <p className="text-sm font-semibold text-emerald-900">7. Avertissement éthique</p>
+          <p className="text-sm font-semibold text-emerald-900">Avertissement éthique</p>
           <p className="text-xs text-emerald-900">{result.naturalReport.ethicalNotice}</p>
         </div>
       </div>
@@ -459,3 +456,5 @@ export default function Resultats() {
     </div>
   );
 }
+
+

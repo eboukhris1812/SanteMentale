@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -296,19 +296,16 @@ export default function SpecificTestRunner({
         {result.naturalReport && (
           <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3">
             <p className="font-semibold text-emerald-900">Synthèse de ton évaluation</p>
+            <p className="text-sm text-emerald-950">{result.naturalReport.introduction}</p>
             <div className="space-y-1">
-              <p className="text-sm font-semibold text-emerald-900">1. Introduction</p>
-              <p className="text-sm text-emerald-950">{result.naturalReport.introduction}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-emerald-900">2. Résumé émotionnel</p>
+              <p className="text-sm font-semibold text-emerald-900">Résumé émotionnel</p>
               <p className="text-sm text-emerald-950">{result.naturalReport.emotionalSummary}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm font-semibold text-emerald-900">
                 {result.naturalReport.hasDominantCategory
-                  ? "3. Focus sur la catégorie dominante"
-                  : "3. Focus général"}
+                  ? "Focus sur la catégorie dominante"
+                  : "Focus général"}
               </p>
               <p className="text-sm text-emerald-950">{result.naturalReport.dominantFocus}</p>
             </div>
@@ -459,4 +456,5 @@ export default function SpecificTestRunner({
     </div>
   );
 }
+
 

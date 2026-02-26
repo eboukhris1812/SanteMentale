@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCategoryBySlug, getTroubleBySlug, troubles } from "@/lib/content/mentalHealthCatalog";
 
@@ -14,7 +14,7 @@ const visualsBySlug: Record<string, TroubleVisual> = {
     alt: "Adolescent stresse en contexte scolaire, regard inquiet",
     rationale: "L'image montre une anxiété fonctionnelle du quotidien, facilement identifiable par les jeunes.",
   },
-  "dépression-majeure": {
+  "depression-majeure": {
     imageUrl: "https://images.unsplash.com/photo-1493836512294-502baa1986e2?auto=format&fit=crop&w=1600&q=80",
     alt: "Jeune assis seul avec posture repliee, ambiance realiste d'isolement",
     rationale: "Le visuel reflete l'isolement et la perte d'elan sans dramatisation excessive.",
@@ -119,6 +119,7 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
   const isStressAigu = trouble.slug === "stress-aigu";
   const isAttachementReactionnel = trouble.slug === "attachement-reactionnel";
   const isPersonnaliteParanoiaque = trouble.slug === "personnalite-paranoiaque";
+  const isPersonnaliteBorderline = trouble.slug === "personnalite-borderline";
   const isPersonnaliteAntisociale = trouble.slug === "personnalite-antisociale";
   const isPersonnaliteEvitante = trouble.slug === "personnalite-evitante";
   const isPersonnaliteDependante = trouble.slug === "personnalite-dependante";
@@ -129,12 +130,16 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
   const isTsa = trouble.slug === "tsa";
   const isGillesTourette = trouble.slug === "gilles-tourette";
   const isBipolaireTypeIOrII = trouble.slug === "bipolaire-type-1" || trouble.slug === "bipolaire-type-2";
-  const isTroublesDepressifs = trouble.slug === "dépression-majeure";
+  const isTroubleCyclothymique = trouble.slug === "trouble-cyclothymique";
+  const isToc = trouble.slug === "toc";
+  const isTroublesDepressifs =
+    trouble.slug === "depression-majeure" || trouble.slug === "dépression-majeure";
   const isTroublePanique = trouble.slug === "trouble-panique";
   const isAgoraphobie = trouble.slug === "agoraphobie";
   const isPhobieSociale = trouble.slug === "phobie-sociale";
   const isTag = trouble.slug === "trouble-anxieux-generalise";
-  const isPhobiesSpecifiques = trouble.slug === "phobies-spécifiques";
+  const isPhobiesSpecifiques =
+    trouble.slug === "phobies-specifiques" || trouble.slug === "phobies-spécifiques";
 
   return (
     <div className="space-y-6">
@@ -576,6 +581,153 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
               sociales et familiales. Bien qu'aucun traitement curatif n'existe, une prise en charge adaptée, centrée sur la
               psychothérapie et parfois associée à une pharmacothérapie, peut réduire les symptômes et améliorer la qualité de vie
               des patients.
+            </p>
+          </section>
+        </>
+      ) : isPersonnaliteBorderline ? (
+        <>
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-2 text-xl font-semibold">Introduction</h2>
+            <p className="leading-7 text-slate-700">
+              Le trouble de la personnalité borderline est une affection psychiatrique caractérisée par une instabilité marquée
+              dans les relations interpersonnelles, l&apos;image de soi et les affects, associée à une impulsivité importante. La
+              prévalence est estimée entre 1,6 et 5,9 % de la population générale, avec une prédominance féminine (environ 75 %
+              des cas). Il débute généralement à l&apos;adolescence ou au début de l&apos;âge adulte et entraîne une souffrance
+              psychologique significative ainsi qu&apos;un risque élevé de comportements suicidaires.
+            </p>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Causes</h2>
+            <ul className="list-disc space-y-1 pl-5 text-slate-700">
+              <li>
+                Facteurs génétiques : risque accru chez les apparentés au premier degré ; héritabilité estimée entre 40 et 60 %.
+              </li>
+              <li>
+                Facteurs neurobiologiques : anomalies dans les circuits de la régulation émotionnelle (amygdale, cortex préfrontal).
+              </li>
+              <li>
+                Facteurs environnementaux : traumatismes précoces (abus, négligence, séparation parentale), environnement familial
+                instable.
+              </li>
+              <li>
+                Facteurs psychologiques : difficultés précoces dans l&apos;attachement, hypersensibilité au rejet et à l&apos;abandon.
+              </li>
+            </ul>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Symptômes</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Instabilité relationnelle</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Alternance entre idéalisation et dévalorisation des proches.</li>
+                  <li>Peur intense de l&apos;abandon réel ou imaginé.</li>
+                </ul>
+              </article>
+
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Perturbation de l&apos;identité</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Image de soi instable, sentiment chronique de vide.</li>
+                  <li>Difficulté à maintenir une cohérence personnelle.</li>
+                </ul>
+              </article>
+
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Impulsivité</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Dépenses excessives, sexualité à risque, abus de substances, conduite dangereuse.</li>
+                  <li>Automutilations et comportements suicidaires fréquents.</li>
+                </ul>
+              </article>
+
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Instabilité émotionnelle</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Humeur très fluctuante, irritabilité, colère intense.</li>
+                  <li>Crises de désespoir ou anxiété sévère.</li>
+                </ul>
+              </article>
+
+              <article className="rounded-xl border border-slate-200 bg-white p-4 md:col-span-2">
+                <h3 className="text-base font-semibold text-slate-900">Autres manifestations</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Sentiment de vide chronique.</li>
+                  <li>Colères inappropriées ou difficultés à les contrôler.</li>
+                  <li>Idéation paranoïde transitoire ou symptômes dissociatifs liés au stress.</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Diagnostic</h2>
+            <p className="text-slate-700">Le diagnostic repose sur les critères du DSM-5-TR :</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">
+              <li>Mode général d&apos;instabilité des relations, de l&apos;image de soi et des affects, avec impulsivité marquée.</li>
+              <li>
+                Présence d&apos;au moins 5 critères parmi 9 (efforts pour éviter l&apos;abandon, relations instables, perturbation de
+                l&apos;identité, impulsivité, comportements suicidaires/automutilations, instabilité affective, sentiment de vide,
+                colère intense, symptômes dissociatifs/paranoïdes).
+              </li>
+              <li>
+                Diagnostic différentiel : trouble bipolaire, trouble de la personnalité histrionique, trouble de la personnalité
+                antisociale, abus de substances.
+              </li>
+            </ul>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Traitement</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Psychothérapie (approche de choix)</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>
+                    Thérapie comportementale dialectique (TCD/DBT) : amélioration de la régulation émotionnelle et réduction des
+                    comportements suicidaires.
+                  </li>
+                  <li>Thérapie basée sur la mentalisation (MBT).</li>
+                  <li>Thérapie des schémas.</li>
+                </ul>
+              </article>
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Pharmacothérapie (adjuvante)</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Antidépresseurs (ISRS) pour les symptômes dépressifs ou anxieux.</li>
+                  <li>Stabilisateurs de l&apos;humeur pour l&apos;impulsivité et l&apos;instabilité émotionnelle.</li>
+                  <li>Antipsychotiques atypiques pour les symptômes dissociatifs ou paranoïdes.</li>
+                </ul>
+              </article>
+              <article className="rounded-xl border border-slate-200 bg-white p-4 md:col-span-2">
+                <h3 className="text-base font-semibold text-slate-900">Limites</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Risque de dépendance aux soins et aux thérapeutes.</li>
+                  <li>Difficulté d&apos;adhésion au traitement en raison de l&apos;instabilité relationnelle.</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Pronostic et suivi</h2>
+            <ul className="list-disc space-y-1 pl-5 text-slate-700">
+              <li>Trouble chronique, mais amélioration possible avec une prise en charge adaptée.</li>
+              <li>Risque élevé de tentatives de suicide (jusqu&apos;à 70 % des patients en rapportent au moins une).</li>
+              <li>Pronostic favorable si suivi psychothérapeutique régulier et soutien social.</li>
+              <li>Comorbidités fréquentes : dépression majeure, troubles anxieux, abus de substances, troubles alimentaires.</li>
+            </ul>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-2 text-xl font-semibold">Conclusion</h2>
+            <p className="leading-7 text-slate-700">
+              Le trouble de la personnalité borderline est une pathologie sévère, marquée par une instabilité émotionnelle et
+              relationnelle, une impulsivité chronique et un risque suicidaire élevé. Bien que complexe à traiter, les approches
+              psychothérapeutiques spécialisées, associées parfois à une pharmacothérapie ciblée, permettent une amélioration
+              significative de la qualité de vie et une réduction des comportements à risque.
             </p>
           </section>
         </>
@@ -1783,28 +1935,241 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
             </p>
           </section>
         </>
+      ) : isTroubleCyclothymique ? (
+        <>
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-2 text-xl font-semibold">Introduction</h2>
+            <p className="leading-7 text-slate-700">
+              Le trouble cyclothymique est un trouble de l&apos;humeur caractérisé par des fluctuations chroniques entre
+              symptômes hypomaniaques et dépressifs légers (&laquo; minidépression &raquo;). Ces épisodes, moins sévères que
+              ceux du trouble bipolaire, doivent être présents pendant plus de la moitié du temps sur une période ≥ 2 ans.
+              Le trouble cyclothymique est souvent considéré comme un précurseur du trouble bipolaire de type II.
+            </p>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Symptomatologie</h2>
+            <ul className="list-disc space-y-1 pl-5 text-slate-700">
+              <li>Alternance de périodes d&apos;humeur élevée (hypomanie) et d&apos;humeur basse (minidépression)</li>
+              <li>Instabilité émotionnelle chronique</li>
+              <li>Irritabilité, impulsivité</li>
+              <li>Réduction du besoin de sommeil lors des phases hypomaniaques</li>
+              <li>Enthousiasme excessif, énergie accrue, comportements intrusifs</li>
+              <li>Périodes de pessimisme, fatigue, baisse de motivation</li>
+            </ul>
+            <p className="mt-3 text-slate-700">Les conséquences incluent :</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">
+              <li>Relations interpersonnelles instables</li>
+              <li>Antécédents scolaires et professionnels inégaux</li>
+              <li>Changements fréquents de résidence</li>
+              <li>Ruptures sentimentales répétées</li>
+              <li>Risque d&apos;abus d&apos;alcool et de drogues</li>
+            </ul>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Diagnostic</h2>
+            <p className="text-slate-700">Critères DSM-5-TR :</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">
+              <li>Présence de nombreuses périodes avec symptômes hypomaniaques et dépressifs ne répondant pas aux critères complets d&apos;un épisode</li>
+              <li>Symptômes présents ≥ 2 ans, sans période &gt; 2 mois sans symptômes</li>
+              <li>Souffrance significative ou altération du fonctionnement</li>
+              <li>Exclusion d&apos;autres troubles psychiatriques (schizoaffectif, délirant) ou causes médicales (hyperthyroïdie)</li>
+            </ul>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Traitement</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Soins de support</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Éducation du patient sur la nature du trouble</li>
+                  <li>Encouragement à adopter un mode de vie flexible et adapté</li>
+                  <li>Groupes de soutien pour partager expériences et stratégies</li>
+                </ul>
+              </article>
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Pharmacothérapie</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Stabilisateurs de l&apos;humeur : lithium, valproate, carbamazépine, lamotrigine</li>
+                  <li>Antidépresseurs à éviter sauf en cas de dépression sévère et prolongée (risque de cycles rapides)</li>
+                </ul>
+              </article>
+              <article className="rounded-xl border border-slate-200 bg-white p-4 md:col-span-2">
+                <h3 className="text-base font-semibold text-slate-900">Psychothérapie</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Thérapie cognitivo-comportementale pour améliorer la régulation émotionnelle</li>
+                  <li>Psychoéducation et accompagnement familial</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Pronostic et suivi</h2>
+            <ul className="list-disc space-y-1 pl-5 text-slate-700">
+              <li>Évolution chronique avec risque de progression vers un trouble bipolaire de type II</li>
+              <li>Impact variable : certains patients trouvent une créativité accrue, mais la majorité souffre d&apos;instabilité sociale et professionnelle</li>
+              <li>Pronostic amélioré par une prise en charge précoce et un suivi régulier</li>
+            </ul>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-2 text-xl font-semibold">Conclusion</h2>
+            <p className="leading-7 text-slate-700">
+              Le trouble cyclothymique est une pathologie de l&apos;humeur marquée par une instabilité chronique, souvent
+              invalidante. Bien qu&apos;il puisse favoriser la créativité chez certains, il entraîne le plus souvent des difficultés
+              relationnelles et professionnelles. Une prise en charge adaptée, combinant psychoéducation, soutien et stabilisateurs
+              de l&apos;humeur, permet de réduire l&apos;impact fonctionnel et d&apos;améliorer la qualité de vie.
+            </p>
+          </section>
+        </>
+      ) : isToc ? (
+        <>
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-2 text-xl font-semibold">Introduction</h2>
+            <p className="leading-7 text-slate-700">
+              Le trouble obsessionnel compulsif est une pathologie psychiatrique fréquente et invalidante, caractérisée par la
+              présence d’obsessions (pensées intrusives, récurrentes, anxiogènes) et/ou de compulsions (rituels ou comportements
+              répétitifs visant à réduire l’anxiété). La prévalence est estimée entre 2 et 3 % de la population générale. L’âge
+              de début se situe souvent à l’adolescence ou au début de l’âge adulte, avec environ 25 % des cas apparaissant avant
+              14 ans. Le TOC figure parmi les 10 principales causes d’invalidité socioprofessionnelle dans le monde.
+            </p>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Causes</h2>
+            <ul className="list-disc space-y-1 pl-5 text-slate-700">
+              <li>Facteurs génétiques : risque accru chez les apparentés au premier degré ; héritabilité estimée à 40-50 %.</li>
+              <li>
+                Facteurs neurobiologiques : dysfonctionnement des circuits cortico-striato-thalamo-corticaux impliqués dans la
+                régulation des pensées et des comportements.
+              </li>
+              <li>Facteurs environnementaux : antécédents de traumatismes psychologiques, stress chronique.</li>
+              <li>Facteurs psychologiques : perfectionnisme, rigidité cognitive, hypersensibilité à l’incertitude.</li>
+            </ul>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Symptômes</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Obsessions</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Pensées, images ou impulsions intrusives, répétitives et incontrôlables.</li>
+                  <li>Contenu fréquent : contamination, doute, agressivité, sexualité, ordre/symétrie.</li>
+                </ul>
+              </article>
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Compulsions</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Comportements ou rituels répétitifs (lavage, vérification, rangement, comptage).</li>
+                  <li>Sentiment de contrainte, impossibilité de résister.</li>
+                  <li>Réduction temporaire de l’anxiété liée aux obsessions.</li>
+                </ul>
+              </article>
+              <article className="rounded-xl border border-slate-200 bg-white p-4 md:col-span-2">
+                <h3 className="text-base font-semibold text-slate-900">Autres manifestations</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Anxiété importante, détresse psychologique.</li>
+                  <li>Perte de temps considérable (plusieurs heures par jour).</li>
+                  <li>Impact fonctionnel majeur (travail, vie sociale, familiale).</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Diagnostic</h2>
+            <p className="text-slate-700">Le diagnostic repose sur les critères du DSM-5-TR :</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">
+              <li>Présence d’obsessions et/ou de compulsions.</li>
+              <li>
+                Les obsessions/compulsions sont chroniques, excessives et entraînent une détresse significative ou une altération
+                du fonctionnement.
+              </li>
+              <li>Les symptômes ne sont pas attribuables à une substance ou à une autre affection médicale.</li>
+              <li>
+                Diagnostic différentiel : troubles anxieux, troubles psychotiques, troubles du spectre autistique, trouble de la
+                personnalité obsessionnelle-compulsive.
+              </li>
+            </ul>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Traitement</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Psychothérapie (approche de choix)</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Thérapie cognitivo-comportementale (TCC) avec exposition et prévention de la réponse (EPR).</li>
+                  <li>Thérapies de troisième vague (ACT, pleine conscience) en complément.</li>
+                </ul>
+              </article>
+              <article className="rounded-xl border border-slate-200 bg-white p-4">
+                <h3 className="text-base font-semibold text-slate-900">Pharmacothérapie</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Inhibiteurs sélectifs de la recapture de la sérotonine (ISRS) à doses élevées.</li>
+                  <li>Clomipramine (antidépresseur tricyclique) en cas de résistance.</li>
+                  <li>Antipsychotiques atypiques en association dans les formes sévères résistantes.</li>
+                </ul>
+              </article>
+              <article className="rounded-xl border border-slate-200 bg-white p-4 md:col-span-2">
+                <h3 className="text-base font-semibold text-slate-900">Limites</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  <li>Risque de rechute après arrêt du traitement.</li>
+                  <li>Nécessité d’un suivi prolongé.</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-3 text-xl font-semibold">Pronostic et suivi</h2>
+            <ul className="list-disc space-y-1 pl-5 text-slate-700">
+              <li>Trouble chronique, mais amélioration possible avec traitement adapté.</li>
+              <li>Évolution fluctuante, avec périodes de rémission et de rechute.</li>
+              <li>Pronostic favorable si prise en charge précoce et adhésion au traitement.</li>
+              <li>
+                Comorbidités fréquentes : dépression majeure, troubles anxieux, troubles du spectre autistique, tics et syndrome
+                de Gilles de la Tourette.
+              </li>
+            </ul>
+          </section>
+
+          <section className="surface-card rounded-2xl p-5">
+            <h2 className="mb-2 text-xl font-semibold">Conclusion</h2>
+            <p className="leading-7 text-slate-700">
+              Le trouble obsessionnel compulsif est une pathologie anxieuse sévère, marquée par des obsessions envahissantes et
+              des compulsions ritualisées. Bien que souvent chronique, une prise en charge combinant thérapie
+              cognitivo-comportementale et pharmacothérapie permet une réduction significative des symptômes et une amélioration de
+              la qualité de vie.
+            </p>
+          </section>
+        </>
       ) : isTroublesDepressifs ? (
         <>
           <section className="surface-card rounded-2xl p-5">
             <h2 className="mb-2 text-xl font-semibold">Introduction</h2>
             <p className="leading-7 text-slate-700">
-              Les troubles dépressifs regroupent plusieurs formes de dépression caracterisees par une tristesse persistante, une
-              perte d'intérêt ou de plaisir (anhedonie), et une altération du fonctionnement quotidien. Ils incluent le trouble
+              Les troubles dépressifs regroupent plusieurs formes de dépression caractérisées par une tristesse persistante, une
+              perte d’intérêt ou de plaisir (anhédonie), et une altération du fonctionnement quotidien. Ils incluent le trouble
               dépressif majeur, le trouble dépressif persistant (dysthymie), le trouble dysphorique prémenstruel, le trouble de
-              deuil prolongé et d'autres formes spécifiques ou non spécifiées. Leur origine est multifactorielle : génétique,
+              deuil prolongé et d’autres formes spécifiques ou non spécifiées. Leur origine est multifactorielle : génétique,
               neurobiologique, endocrinienne et psychosociale.
             </p>
           </section>
 
           <section className="surface-card rounded-2xl p-5">
-            <h2 className="mb-3 text-xl font-semibold">Etiologie</h2>
+            <h2 className="mb-3 text-xl font-semibold">Étiologie</h2>
             <ul className="list-disc space-y-1 pl-5 text-slate-700">
-              <li>Facteurs génétiques : hérédité impliquee dans environ 50 % des cas, forte concordance chez les jumeaux monozygotes</li>
-              <li>Neurotransmetteurs : anomalies de la régulation serotoninergique, dopaminergique, noradrenergique, glutamatergique</li>
-              <li>Neuroendocrinologie : dysfonctionnement des axes hypothalamo-hypophyso-surrenal, thyroidien et hormone de croissance</li>
-              <li>Facteurs psychosociaux : stress majeurs, pertes, separations, vulnerabilite individuelle</li>
-              <li>Facteurs medicaux : pathologies endocriniennes, neurologiques, infectieuses, maladies chroniques</li>
-              <li>Substances et médicaments : corticostéroïdes, beta-bloqueurs, alcool, amphétamines</li>
+              <li>Facteurs génétiques : hérédité impliquée dans environ 50 % des cas, forte concordance chez les jumeaux monozygotes</li>
+              <li>Neurotransmetteurs : anomalies de la régulation sérotoninergique, dopaminergique, noradrénergique, glutamatergique</li>
+              <li>Neuroendocrinologie : dysfonctionnement des axes hypothalamo-hypophyso-surrénalien, thyroïdien et hormone de croissance</li>
+              <li>Facteurs psychosociaux : stress majeurs, pertes, séparations, vulnérabilité individuelle</li>
+              <li>Facteurs médicaux : pathologies endocriniennes, neurologiques, infectieuses, maladies chroniques</li>
+              <li>Substances et médicaments : corticostéroïdes, bêta-bloqueurs, alcool, amphétamines</li>
             </ul>
           </section>
 
@@ -1813,43 +2178,43 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
             <p className="text-slate-700">Les symptômes incluent :</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">
               <li>Humeur dépressive persistante</li>
-              <li>Anhedonie</li>
-              <li>Fatigue, baisse d'energie</li>
+              <li>Anhédonie</li>
+              <li>Fatigue, baisse d’énergie</li>
               <li>Troubles du sommeil (insomnie ou hypersomnie)</li>
-              <li>Modifications de l'appetit et du poids</li>
+              <li>Modifications de l’appétit et du poids</li>
               <li>Troubles cognitifs (concentration, mémoire, indécision)</li>
-              <li>Sentiment de devalorisation, culpabilité excessive</li>
+              <li>Sentiment de dévalorisation, culpabilité excessive</li>
               <li>Idées suicidaires ou comportements suicidaires</li>
             </ul>
 
             <h3 className="mt-4 text-base font-semibold text-slate-900">Formes cliniques</h3>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">
-              <li>Trouble dépressif majeur : au moins 5 symptômes pendant au moins 2 semaines, dont humeur dépressive ou anhedonie</li>
-              <li>Trouble dépressif persistant (dysthymie) : symptômes pendant au moins 2 ans, humeur sombre chronique</li>
+              <li>Trouble dépressif majeur : ≥ 5 symptômes pendant ≥ 2 semaines, dont humeur dépressive ou anhédonie</li>
+              <li>Trouble dépressif persistant (dysthymie) : symptômes ≥ 2 ans, humeur sombre chronique</li>
               <li>Trouble dysphorique prémenstruel : symptômes liés au cycle menstruel, sévères et invalidants</li>
-              <li>Trouble de deuil prolongé : tristesse persistante pendant au moins 1 an apres une perte, avec souffrance invalidante</li>
+              <li>Trouble de deuil prolongé : tristesse persistante ≥ 1 an après une perte, avec souffrance invalidante</li>
               <li>Autres troubles dépressifs : symptômes dépressifs significatifs sans répondre aux critères complets</li>
             </ul>
 
-            <h3 className="mt-4 text-base font-semibold text-slate-900">Specificateurs</h3>
+            <h3 className="mt-4 text-base font-semibold text-slate-900">Spécificateurs</h3>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">
-              <li>Detresse anxieuse</li>
-              <li>Caracteristiques mixtes</li>
-              <li>Melancolique</li>
+              <li>Détresse anxieuse</li>
+              <li>Caractéristiques mixtes</li>
+              <li>Mélancolique</li>
               <li>Atypique</li>
               <li>Psychotique</li>
               <li>Catatonique</li>
-              <li>Apparition peripartum</li>
-              <li>Schema saisonnier</li>
+              <li>Apparition péripartum</li>
+              <li>Schéma saisonnier</li>
             </ul>
           </section>
 
           <section className="surface-card rounded-2xl p-5">
             <h2 className="mb-3 text-xl font-semibold">Diagnostic</h2>
             <ul className="list-disc space-y-1 pl-5 text-slate-700">
-              <li>Anamnese clinique et critères DSM-5-TR</li>
+              <li>Anamnèse clinique et critères DSM-5-TR</li>
               <li>Exclusion de causes médicales (NFS, TSH, vitamine B12, folates)</li>
-              <li>Differenciation avec demoralisation, chagrin, troubles anxieux, troubles bipolaires</li>
+              <li>Différenciation avec démoralisation, chagrin, troubles anxieux, troubles bipolaires</li>
               <li>Utilisation d'outils de dépistage (PHQ-9, Beck Depression Inventory)</li>
             </ul>
           </section>
@@ -1862,23 +2227,23 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
                   <li>Thérapie cognitivo-comportementale (TCC)</li>
                   <li>Thérapie interpersonnelle</li>
-                  <li>Soutien psychologique et psychoeducation</li>
+                  <li>Soutien psychologique et psychoéducation</li>
                 </ul>
               </article>
               <article className="rounded-xl border border-slate-200 bg-white p-4">
                 <h3 className="text-base font-semibold text-slate-900">Pharmacothérapie</h3>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
-                  <li>ISRS, IRSN, modulateurs serotoninergiques</li>
+                  <li>ISRS, IRSN, modulateurs sérotoninergiques</li>
                   <li>Antidépresseurs tricycliques, IMAO</li>
-                  <li>Ketamine et esketamine (formes resistantes)</li>
+                  <li>Kétamine et eskétamine (formes résistantes)</li>
                 </ul>
               </article>
               <article className="rounded-xl border border-slate-200 bg-white p-4 md:col-span-2">
                 <h3 className="text-base font-semibold text-slate-900">Autres traitements</h3>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
-                  <li>Electroconvulsivothérapie (ECT)</li>
-                  <li>Stimulation magnetique transcranienne (rTMS)</li>
-                  <li>Activite physique, hygiene de vie</li>
+                  <li>Électroconvulsivothérapie (ECT)</li>
+                  <li>Stimulation magnétique transcrânienne (rTMS)</li>
+                  <li>Activité physique, hygiène de vie</li>
                 </ul>
               </article>
             </div>
@@ -1887,9 +2252,9 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
           <section className="surface-card rounded-2xl p-5">
             <h2 className="mb-3 text-xl font-semibold">Pronostic et suivi</h2>
             <ul className="list-disc space-y-1 pl-5 text-slate-700">
-              <li>Évolution variable : episodes isolés ou récurrents</li>
-              <li>Risque élevé de récidive apres un premier episode</li>
-              <li>Pronostic améliore par une prise en charge précoce et adaptée</li>
+              <li>Évolution variable : épisodes isolés ou récurrents</li>
+              <li>Risque élevé de récidive après un premier épisode</li>
+              <li>Pronostic amélioré par une prise en charge précoce et adaptée</li>
               <li>Importance du suivi régulier, du traitement d'entretien et de la prévention des rechutes</li>
             </ul>
           </section>
@@ -2368,9 +2733,9 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
             <h2 className="mb-2 text-xl font-semibold">Introduction</h2>
             <p className="leading-7 text-slate-700">
               Les phobies spécifiques sont des peurs intenses, irrationnelles et persistantes liées à des objets, situations ou
-              circonstances particulieres. Elles entrainent une anxiété immédiate et des comportements d'évitement. Bien que la
-              personne reconnaisse souvent le caractere excessif de sa peur, celle-ci reste envahissante et peut perturber le
-              fonctionnement quotidien. Les phobies spécifiques representent le trouble anxieux le plus fréquent.
+              circonstances particulières. Elles entraînent une anxiété immédiate et des comportements d’évitement. Bien que la
+              personne reconnaisse souvent le caractère excessif de sa peur, celle-ci reste envahissante et peut perturber le
+              fonctionnement quotidien. Les phobies spécifiques représentent le trouble anxieux le plus fréquent.
             </p>
           </section>
 
@@ -2378,14 +2743,14 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
             <h2 className="mb-3 text-xl font-semibold">Symptômes</h2>
             <p className="text-slate-700">
               Les personnes atteintes développent une peur ou une anxiété marquée en présence de l'objet ou de la situation
-              phobogene. Les symptômes incluent :
+              phobogène. Les symptômes incluent :
             </p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">
               <li>Palpitations, tachycardie</li>
               <li>Tremblements, secousses musculaires</li>
               <li>Transpiration excessive</li>
               <li>Douleurs musculaires</li>
-              <li>Maux de ventre, diarrhee</li>
+              <li>Maux de ventre, diarrhée</li>
               <li>Confusion</li>
               <li>Crises de panique dans les cas sévères</li>
             </ul>
@@ -2393,17 +2758,17 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
 
           <section className="surface-card rounded-2xl p-5">
             <h2 className="mb-3 text-xl font-semibold">Diagnostic</h2>
-            <p className="text-slate-700">Le diagnostic repose sur l'anamnese clinique et les critères du DSM-5-TR :</p>
+            <p className="text-slate-700">Le diagnostic repose sur l’anamnèse clinique et les critères du DSM-5-TR :</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">
-              <li>Peur ou anxiété persistante (au moins 6 mois) liée à un objet ou une situation spécifique</li>
+              <li>Peur ou anxiété persistante (≥ 6 mois) liée à un objet ou une situation spécifique</li>
               <li>Déclenchement quasi systématique de la peur ou de l'anxiété</li>
               <li>Évitement actif de la situation ou de l'objet</li>
-              <li>Reaction disproportionnée par rapport au danger reel</li>
+              <li>Réaction disproportionnée par rapport au danger réel</li>
               <li>Souffrance significative ou altération du fonctionnement social/professionnel</li>
             </ul>
             <p className="mt-3 text-sm text-slate-600">
               Diagnostic différentiel : autres troubles anxieux, dépression, troubles bipolaires, troubles liés aux substances,
-              troubles de la personnalite.
+              troubles de la personnalité.
             </p>
           </section>
 
@@ -2422,12 +2787,12 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
           </section>
 
           <section className="surface-card rounded-2xl p-5">
-            <h2 className="mb-3 text-xl font-semibold">Epidemiologie</h2>
+            <h2 className="mb-3 text-xl font-semibold">Épidémiologie</h2>
             <ul className="list-disc space-y-1 pl-5 text-slate-700">
               <li>Prévalence annuelle : environ 8 % des femmes et 3 % des hommes</li>
-              <li>Prévalence vie entiere : environ 9 % de la population</li>
-              <li>Début fréquent dès l'enfance ou l'adolescence, mais possible à tout age</li>
-              <li>Facteurs de risque : biologiques, hereditaires, individuels et environnementaux</li>
+              <li>Prévalence vie entière : environ 9 % de la population</li>
+              <li>Début fréquent dès l'enfance ou l'adolescence, mais possible à tout âge</li>
+              <li>Facteurs de risque : biologiques, héréditaires, individuels et environnementaux</li>
             </ul>
           </section>
 
@@ -2439,14 +2804,17 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
                   <li>Thérapie d'exposition : confrontation progressive à l'objet ou la situation redoutée</li>
                   <li>Thérapie cognitivo-comportementale (TCC) : modification des pensées et comportements dysfonctionnels</li>
-                  <li>Hypnose : parfois utilisee comme complément</li>
+                  <li>Hypnose : parfois utilisée comme complément</li>
                 </ul>
               </article>
               <article className="rounded-xl border border-slate-200 bg-white p-4">
-                <h3 className="text-base font-semibold text-slate-900">Pharmacothérapie et autres approches</h3>
+                <h3 className="text-base font-semibold text-slate-900">Pharmacothérapie</h3>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
                   <li>Antidépresseurs (ISRS, IRSN)</li>
-                  <li>Anxiolytiques (benzodiazepines) en usage limite</li>
+                  <li>Anxiolytiques (benzodiazépines) en usage limité</li>
+                </ul>
+                <h3 className="mt-4 text-base font-semibold text-slate-900">Autres approches</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
                   <li>Psychoeducation</li>
                   <li>Techniques de relaxation et gestion du stress</li>
                 </ul>
@@ -2460,7 +2828,7 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
               <li>Évolution variable selon la sévérité et l'objet de la phobie</li>
               <li>Amélioration significative avec une prise en charge adaptée</li>
               <li>Importance d'un suivi régulier pour prévenir les rechutes</li>
-              <li>Risque de complications si non traite (isolement, altération du fonctionnement, refus de soins medicaux)</li>
+              <li>Risque de complications si non traité (isolement, altération du fonctionnement, refus de soins médicaux)</li>
             </ul>
           </section>
 
@@ -2469,8 +2837,8 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
             <p className="leading-7 text-slate-700">
               Les phobies spécifiques sont des troubles anxieux fréquents et invalidants. Une prise en charge précoce, reposant
               principalement sur la thérapie d'exposition et la TCC, permet de réduire l'anxiété et de restaurer le fonctionnement
-              quotidien. Les traitements pharmacologiques peuvent etre utilisés en complément. La reconnaissance et le traitement de
-              ces phobies ameliorent considérablement la qualité de vie des patients.
+              quotidien. Les traitements pharmacologiques peuvent être utilisés en complément. La reconnaissance et le traitement de
+              ces phobies améliorent considérablement la qualité de vie des patients.
             </p>
           </section>
         </>
@@ -2533,3 +2901,4 @@ export default async function TroubleDetailPage({ params }: { params: Promise<{ 
     </div>
   );
 }
+
