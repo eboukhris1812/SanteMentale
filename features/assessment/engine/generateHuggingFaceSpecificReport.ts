@@ -34,7 +34,7 @@ const DEFAULT_MAX_NEW_TOKENS = 600;
 const HF_MAX_RETRIES = 2;
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24;
 const REPORT_CACHE_MAX_ITEMS = 500;
-const CACHE_VERSION = "specific-hf-v2";
+const CACHE_VERSION = "specific-hf-v3";
 const reportCache = new Map<string, CacheEntry>();
 
 type FallbackBand = "light" | "moderate" | "high";
@@ -91,6 +91,8 @@ function stableProfileHash(testId: string, score: QuestionnaireScore, answers: n
     testId,
     normalized: Number(score.normalizedScore.toFixed(4)),
     severity: score.interpretation.severity,
+    interpretationLabel: score.interpretation.label,
+    components: score.components ?? null,
     answers,
   };
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
@@ -180,16 +182,29 @@ function buildPromptForHuggingFaceSpecific(
   urgentSupportRecommended: boolean
 ): string {
   const topItems = pickMostRelevantItems(answers, 3);
+  const componentsSummary = score.components
+    ? Object.entries(score.components)
+        .map(([key, value]) => `${key}=${value}`)
+        .join(", ")
+    : "none";
+  const mdqConstraint =
+    testId === "mdq"
+      ? `Contraintes MDQ factuelles: officialPositiveScreen=${score.components?.officialPositiveScreen ?? "unknown"}, symptomCriterionMet=${score.components?.symptomCriterionMet ?? "unknown"}, cooccurrenceYes=${score.components?.cooccurrenceYes ?? "unknown"}, impairmentModerateOrSerious=${score.components?.impairmentModerateOrSerious ?? "unknown"}. Si officialPositiveScreen=0, ne pas affirmer que les criteres complets sont valides et ne pas conclure a un depistage officiel positif.`
+      : "";
   return [
     "Tu es psychologue clinicien et redacteur scientifique en sante mentale.",
     "Tu rediges un rapport court pour un test psychometrique specifique.",
     `Test: ${testId}.`,
     `Niveau normalise (0-1): ${score.normalizedScore.toFixed(2)}.`,
     `Interpretation: ${score.interpretation.label}.`,
+    `Signification clinique: ${score.interpretation.clinicalMeaning}.`,
+    `Composants de score: ${componentsSummary}.`,
     `Items saillants (indices): ${topItems.join("/") || "none"}.`,
     `Signal urgent: ${urgentSupportRecommended ? "oui" : "non"}.`,
+    mdqConstraint,
     "Redige un rapport unique, personalise, synthetique, scientifique et bienveillant en francais.",
     "Interdictions: aucune repetition, aucun score brut, aucun diagnostic certain, aucun titre, aucune mention d'entretien clinique.",
+    "Interdictions supplementaires: ne jamais inventer l'age, ne jamais dire 'votre enfant', ne jamais inventer des informations familiales ou scolaires.",
     "Structure obligatoire en 7 paragraphes dans cet ordre: introduction, synthese emotionnelle/symptomes, focus du test, psychoeducation, recommandations concretes, encouragement, avertissement ethique.",
     "Format strict: exactement 7 paragraphes separes par une ligne vide (\\n\\n).",
   ].join("\n");
@@ -201,6 +216,10 @@ function sanitizeOutput(text: string): string {
     .replace(/\b(PHQ-?9|GAD-?7|PCL-?5|TOC|EAT-?26)\s*[:=]?\s*\d+\s*(\/\s*\d+)?/gi, "")
     .replace(/\b(entretien clinique|entretien|consultation deja faite)\b/gi, "questionnaire")
     .replace(/\b(climat de confiance|passation)\b/gi, "realisation")
+    .replace(/\bvotre enfant\b/gi, "vous")
+    .replace(/\bvotre adolescent\b/gi, "vous")
+    .replace(/\bson enfant\b/gi, "vous")
+    .replace(/\bles parents\b/gi, "la personne")
     .replace(/:\s*1\.\s*/g, ": 1. ")
     .replace(/\s+2\.\s*$/g, " ")
     .replace(/\s{3,}/g, " ")
@@ -208,7 +227,7 @@ function sanitizeOutput(text: string): string {
 }
 
 function ensureCompleteEnding(text: string): string {
-  const trimmed = text.trim();
+  const trimmed = text.trim().replace(/\s+[a-z]{1,4}$/i, "");
   if (!trimmed) return trimmed;
   if (/[.!?]"?$/.test(trimmed)) return trimmed;
   return `${trimmed} Ce test reste un outil d'orientation et ne remplace pas une evaluation clinique.`;
@@ -285,6 +304,38 @@ function normalizeParagraphs(text: string): string {
   }
 
   return grouped.slice(0, 7).join("\n\n");
+}
+
+function enforceFactualConsistency(testId: string, score: QuestionnaireScore, text: string): string {
+  let fixed = text
+    .replace(/\bvotre enfant\b/gi, "vous")
+    .replace(/\bvotre adolescent\b/gi, "vous")
+    .replace(/\bson enfant\b/gi, "vous");
+
+  if (testId === "mdq") {
+    const officialPositive = Number(score.components?.officialPositiveScreen ?? -1);
+    if (officialPositive === 0) {
+      fixed = fixed
+        .replace(
+          /\b(vous|la personne)\s+a\s+valide[^.]*criteres[^.]*\./gi,
+          "Le seuil symptomatique est atteint, mais les criteres complets du depistage officiel MDQ ne sont pas reunis."
+        )
+        .replace(
+          /\bdepistage\s+(officiel\s+)?positif[^.]*\./gi,
+          "Le depistage officiel MDQ n'est pas positif sur ce profil."
+        )
+        .replace(
+          /\boriente\s+vers\s+un\s+terrain\s+cyclothymique[^.]*\./gi,
+          "Le profil suggere une vigilance clinique sans conclusion diagnostique."
+        )
+        .replace(
+          /\boriente\s+vers\s+un\s+trouble\s+bipolaire[^.]*\./gi,
+          "Le profil suggere une vigilance clinique sans conclusion diagnostique."
+        );
+    }
+  }
+
+  return fixed;
 }
 
 async function callHuggingFace(prompt: string): Promise<string> {
@@ -395,7 +446,13 @@ export async function generateHuggingFaceSpecificReport(
   try {
     const generated = await callHuggingFace(prompt);
     const report = normalizeParagraphQuality(
-      ensureCompleteEnding(normalizeParagraphs(sanitizeOutput(generated)))
+      normalizeParagraphs(
+        enforceFactualConsistency(
+          testId,
+          score,
+          ensureCompleteEnding(normalizeParagraphs(sanitizeOutput(generated)))
+        )
+      )
     );
     if (!report) throw new Error("Empty generated report");
 
