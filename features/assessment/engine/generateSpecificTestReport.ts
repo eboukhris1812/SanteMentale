@@ -91,16 +91,33 @@ const TEST_FOCUS: Record<string, string> = {
   ygtss: "frequence/intensite des tics et retentissement fonctionnel",
 };
 
+function normalizeText(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function inferBand(score: QuestionnaireScore): Band {
-  const severityRaw = String(score.interpretation.severity ?? "").toLowerCase();
+  const severityRaw = normalizeText(String(score.interpretation.severity ?? ""));
+  const labelRaw = normalizeText(String(score.interpretation.label ?? ""));
   const normalized = Number.isFinite(score.normalizedScore)
     ? Math.max(0, Math.min(1, score.normalizedScore))
     : 0;
 
+  // Prioritize severe/high signals before moderate labels.
   if (
     severityRaw.includes("severe") ||
+    severityRaw.includes("moderatement severe") ||
+    severityRaw.includes("moderately severe") ||
     severityRaw.includes("high") ||
-    severityRaw.includes("positive")
+    severityRaw.includes("positive") ||
+    labelRaw.includes("severe") ||
+    labelRaw.includes("moderee a severe") ||
+    labelRaw.includes("charge symptomatique elevee")
   ) {
     return "high";
   }

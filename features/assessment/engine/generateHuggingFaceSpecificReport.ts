@@ -37,6 +37,45 @@ const REPORT_CACHE_MAX_ITEMS = 500;
 const CACHE_VERSION = "specific-hf-v2";
 const reportCache = new Map<string, CacheEntry>();
 
+type FallbackBand = "light" | "moderate" | "high";
+
+function normalizeText(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function inferFallbackBand(score: QuestionnaireScore): FallbackBand {
+  const severityRaw = normalizeText(String(score.interpretation.severity ?? ""));
+  const labelRaw = normalizeText(String(score.interpretation.label ?? ""));
+  const normalized = Number.isFinite(score.normalizedScore)
+    ? Math.max(0, Math.min(1, score.normalizedScore))
+    : 0;
+
+  if (
+    severityRaw.includes("severe") ||
+    severityRaw.includes("moderately severe") ||
+    severityRaw.includes("moderatement severe") ||
+    severityRaw.includes("high") ||
+    severityRaw.includes("positive") ||
+    labelRaw.includes("severe") ||
+    labelRaw.includes("moderee a severe") ||
+    labelRaw.includes("charge symptomatique elevee")
+  ) {
+    return "high";
+  }
+
+  if (severityRaw.includes("moderate")) return "moderate";
+  if (severityRaw.includes("mild") || severityRaw.includes("minimal")) return "light";
+  if (normalized < 0.34) return "light";
+  if (normalized < 0.67) return "moderate";
+  return "high";
+}
+
 function pickMostRelevantItems(items: number[], topN: number): number[] {
   return items
     .map((value, index) => ({ index, value }))
@@ -107,14 +146,30 @@ async function persistCache(cacheKey: string, entry: CacheEntry): Promise<void> 
 
 function fallbackReport(testId: string, score: QuestionnaireScore): string {
   const natural = generateSpecificTestReport(testId, score);
+  const band = inferFallbackBand(score);
+  const recommendations =
+    band === "high"
+      ? "Priorisez 3 actions simples pendant 7 jours: horaires de sommeil reguliers, reduction des facteurs de surcharge en soiree, et prise de rendez-vous avec un professionnel de sante mentale dans un delai court."
+      : band === "moderate"
+        ? "Mettez en place un plan sur 2 semaines avec routines stables (sommeil, activite physique moderee, respiration lente), puis reevaluez l'evolution des symptomes."
+        : "Maintenez des habitudes protectrices: sommeil regulier, activite physique douce, temps d'ecran limite en fin de journee et points de pause dans la semaine.";
+  const encouragement =
+    band === "high"
+      ? "Une amelioration reste possible meme si la charge actuelle est importante. Un accompagnement structure augmente nettement les chances de stabilisation."
+      : "Avec de la constance et un soutien adapte, ce type de difficulte peut s'ameliorer. Demander de l'aide est une strategie de protection, pas un echec.";
+  const ethical =
+    band === "high"
+      ? "Ce resultat ne remplace pas une evaluation clinique. Si la detresse augmente, si vous vous sentez en risque, ou si des idees de mort apparaissent, contactez sans attendre un professionnel ou les services d'urgence."
+      : "Ce resultat ne remplace pas une evaluation clinique. Si la gene augmente ou devient invalidante, parlez-en rapidement avec un professionnel de sante.";
+
   return [
     natural.introduction,
     natural.emotionalSummary,
     natural.dominantFocus,
     "Ces signaux sont des indicateurs d'orientation et non un diagnostic. Ils servent a mieux comprendre ce qui merite une attention progressive.",
-    "Vous pouvez commencer par des actions courtes et realistes: regularite du sommeil, pauses de respiration, activite physique moderee et reperes de routine.",
-    "Avec de la constance et un soutien adapte, ce type de difficulte peut s'ameliorer. Demander de l'aide est une strategie de protection, pas un echec.",
-    "Ce resultat ne remplace pas une evaluation clinique. Si la gene augmente ou devient invalidante, parlez-en rapidement avec un professionnel de sante.",
+    recommendations,
+    encouragement,
+    ethical,
   ].join("\n\n");
 }
 
