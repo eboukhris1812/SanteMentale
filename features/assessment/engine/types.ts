@@ -97,6 +97,15 @@ export interface AssessmentResults {
     pcl5Short: QuestionnaireScore;
     miniToc: QuestionnaireScore;
   };
+  itemScores?: {
+    phq9: number[];
+    gad7: number[];
+    pcl5Short: number[];
+    miniToc: number[];
+    personalityScreen: number[];
+    eatingScreen: number[];
+    neurodevScreen: number[];
+  };
   categoryScores: Record<DominantCategory, number>;
   dominantCategories: DominantCategory[];
   dominantCategory: DominantCategory | null;

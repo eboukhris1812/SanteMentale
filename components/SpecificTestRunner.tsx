@@ -10,6 +10,9 @@ type QuestionnaireId = keyof typeof questionnaireRegistry;
 type SpecificTestApiResponse = {
   testId: QuestionnaireId;
   score: QuestionnaireScore;
+  aiReport?: string;
+  aiReportSource?: "huggingface" | "fallback";
+  aiReportCached?: boolean;
   naturalReport?: {
     introduction: string;
     emotionalSummary: string;
@@ -69,6 +72,13 @@ export default function SpecificTestRunner({
   const isPdqSectionTest = testId === "pdq4A" || testId === "pdq4B" || testId === "pdq4C";
   const isSapasTest = testId === "sapas";
   const isMsiBpdTest = testId === "msiBpd";
+  const aiReportParagraphs = useMemo(() => {
+    if (!result?.aiReport) return [];
+    return result.aiReport
+      .split(/\n{2,}/)
+      .map((paragraph) => paragraph.trim())
+      .filter((paragraph) => paragraph.length > 0);
+  }, [result?.aiReport]);
 
   const componentLabels: Record<string, string> = {
     motorTicScore: "Sous-score tics moteurs",
@@ -293,7 +303,30 @@ export default function SpecificTestRunner({
           <p className="text-sm text-gray-700">{result.score.interpretation.clinicalMeaning}</p>
         </div>
 
-        {result.naturalReport && (
+        {result.aiReport && (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="font-semibold text-emerald-900">Rapport personnalisé</p>
+              <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-emerald-900">
+                Source: {result.aiReportSource === "huggingface" ? "IA Hugging Face" : "Moteur local"}
+              </span>
+              {result.aiReportCached && (
+                <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-emerald-900">
+                  Cache serveur
+                </span>
+              )}
+            </div>
+            <div className="space-y-3">
+              {aiReportParagraphs.map((paragraph, index) => (
+                <p key={`${index}-${paragraph.slice(0, 24)}`} className="text-sm text-emerald-950">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!result.aiReport && result.naturalReport && (
           <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3">
             <p className="font-semibold text-emerald-900">Synthèse de ton évaluation</p>
             <p className="text-sm text-emerald-950">{result.naturalReport.introduction}</p>

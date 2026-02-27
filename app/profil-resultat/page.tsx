@@ -83,6 +83,9 @@ type ApiResult = {
     | "neurodevelopment"
     | null;
   naturalReport: NaturalReport;
+  aiReport?: string;
+  aiReportSource?: "huggingface" | "fallback";
+  aiReportCached?: boolean;
   methodology: {
     framework: string;
     scoringMethod: string;
@@ -115,8 +118,23 @@ function normalizeApiResult(input: ApiResult | (Omit<ApiResult, "results"> & {
       maybeLegacy.results.dominantCategories ??
       (maybeLegacy.dominantCategory ? [maybeLegacy.dominantCategory] : []);
 
+    const aiReport =
+      maybeLegacy.aiReport ??
+      [
+        maybeLegacy.naturalReport.introduction,
+        maybeLegacy.naturalReport.emotionalSummary,
+        maybeLegacy.naturalReport.dominantFocus,
+        maybeLegacy.naturalReport.psychoeducation,
+        maybeLegacy.naturalReport.recommendations.join(" "),
+        maybeLegacy.naturalReport.encouragement,
+        maybeLegacy.naturalReport.ethicalNotice,
+      ].join("\n\n");
+
     return {
       ...maybeLegacy,
+      aiReport,
+      aiReportSource: maybeLegacy.aiReportSource ?? "fallback",
+      aiReportCached: maybeLegacy.aiReportCached ?? false,
       dominantCategories: resolvedDominantCategories,
       results: {
         ...maybeLegacy.results,
@@ -127,6 +145,19 @@ function normalizeApiResult(input: ApiResult | (Omit<ApiResult, "results"> & {
 
   return {
     ...input,
+    aiReport:
+      input.aiReport ??
+      [
+        input.naturalReport.introduction,
+        input.naturalReport.emotionalSummary,
+        input.naturalReport.dominantFocus,
+        input.naturalReport.psychoeducation,
+        input.naturalReport.recommendations.join(" "),
+        input.naturalReport.encouragement,
+        input.naturalReport.ethicalNotice,
+      ].join("\n\n"),
+    aiReportSource: input.aiReportSource ?? "fallback",
+    aiReportCached: input.aiReportCached ?? false,
     results: {
       scores: input.scores,
       categoryScores: input.categoryScores,
@@ -280,6 +311,16 @@ export default function Resultats() {
     return values.reduce((sum, value) => sum + value, 0) / values.length;
   }, [result]);
 
+  const aiReportParagraphs = useMemo(() => {
+    if (!result?.aiReport) {
+      return [];
+    }
+    return result.aiReport
+      .split(/\n{2,}/)
+      .map((paragraph) => paragraph.trim())
+      .filter((paragraph) => paragraph.length > 0);
+  }, [result]);
+
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow">
@@ -343,37 +384,23 @@ export default function Resultats() {
       </div>
 
       <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3">
-        <p className="font-semibold text-emerald-900">Synthèse de ton évaluation</p>
-        <p className="text-sm text-emerald-950">{result.naturalReport.introduction}</p>
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-emerald-900">Résumé émotionnel</p>
-          <p className="text-sm text-emerald-950">{result.naturalReport.emotionalSummary}</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-semibold text-emerald-900">Rapport personnalisé</p>
+          <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-emerald-900">
+            Source: {result.aiReportSource === "huggingface" ? "IA Hugging Face" : "Moteur local"}
+          </span>
+          {result.aiReportCached && (
+            <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-emerald-900">
+              Cache serveur
+            </span>
+          )}
         </div>
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-emerald-900">
-            Focus sur la catégorie dominante
-          </p>
-          <p className="text-sm text-emerald-950">{result.naturalReport.dominantFocus}</p>
-        </div>
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-emerald-900">Psychoéducation</p>
-          <p className="text-sm text-emerald-950">{result.naturalReport.psychoeducation}</p>
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-emerald-900 mb-1">Recommandations</p>
-          <ul className="list-disc pl-5 space-y-1 text-sm text-emerald-950">
-            {result.naturalReport.recommendations.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-emerald-900">Encouragement</p>
-          <p className="text-sm text-emerald-950">{result.naturalReport.encouragement}</p>
-        </div>
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-emerald-900">Avertissement éthique</p>
-          <p className="text-xs text-emerald-900">{result.naturalReport.ethicalNotice}</p>
+        <div className="space-y-3">
+          {aiReportParagraphs.map((paragraph, index) => (
+            <p key={`${index}-${paragraph.slice(0, 24)}`} className="text-sm text-emerald-950">
+              {paragraph}
+            </p>
+          ))}
         </div>
       </div>
 

@@ -6,3 +6,5 @@ export * from "@/features/assessment/engine/severityInterpreter";
 export * from "@/features/assessment/engine/psychoeducation";
 export * from "@/features/assessment/engine/recommendationEngine";
 export * from "@/features/assessment/engine/generateSpecificTestReport";
+export * from "@/features/assessment/engine/generateHuggingFaceReport";
+export * from "@/features/assessment/engine/generateHuggingFaceSpecificReport";

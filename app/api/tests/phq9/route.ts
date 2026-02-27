@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import {
+  generateHuggingFaceSpecificReport,
   generateSpecificTestReport,
   scoreQuestionnaire,
 } from "@/features/assessment/engine";
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { error: "Limite de requêtes atteinte" },
+        { error: "Limite de requetes atteinte" },
         {
           status: 429,
           headers: {
@@ -36,24 +37,35 @@ export async function POST(request: Request) {
     const payload = specificTestPayloadSchemas.phq9.parse(await request.json());
     const score = scoreQuestionnaire(questionnaireRegistry.phq9, payload.answers);
     const naturalReport = generateSpecificTestReport("phq9", score);
-    const phq9Item9 = payload.answers[8] ?? 0;
-    const urgentSupportRecommended = phq9Item9 >= 1;
+    const urgentSupportRecommended = (payload.answers[8] ?? 0) >= 1;
+    const aiGeneration = await generateHuggingFaceSpecificReport(
+      "phq9",
+      score,
+      payload.answers,
+      urgentSupportRecommended
+    );
 
     return NextResponse.json(
       {
         testId: "phq9",
         score,
         naturalReport,
+        aiReport: aiGeneration.text,
+        aiReportSource: aiGeneration.source,
+        aiReportCached: aiGeneration.cached,
+        ...(process.env.NODE_ENV !== "production" && aiGeneration.error
+          ? { aiReportError: aiGeneration.error }
+          : {}),
         methodology: {
-          framework: "Dépistage psychométrique éducatif (projet IB)",
+          framework: "Depistage psychometrique educatif (projet IB)",
           source: questionnaireRegistry.phq9.scoringRules.source,
           educationalPurposeOnly: true,
         },
         safety: {
           urgentSupportRecommended,
           urgentSupportReason: urgentSupportRecommended
-            ? "Item 9 du PHQ-9 > 0 : demande rapidement de l'aide à un adulte de confiance ou à un professionnel."
-            : "Aucun signal critique immédiat détecté sur l'item 9 du PHQ-9.",
+            ? "Item 9 du PHQ-9 > 0: demande rapidement de l'aide a un adulte de confiance ou a un professionnel."
+            : "Aucun signal critique immediat detecte sur l'item 9 du PHQ-9.",
         },
       },
       {
@@ -67,10 +79,25 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     if (error instanceof Error && "name" in error && error.name === "ZodError") {
-      return NextResponse.json({ error: "Format de données invalide" }, { status: 400 });
+      return NextResponse.json({ error: "Format de donnees invalide" }, { status: 400 });
     }
 
     console.error("/api/tests/phq9 POST failed", error);
     return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
   }
+}
+
+export async function GET() {
+  return NextResponse.json(
+    {
+      testId: "phq9",
+      slug: "phq9",
+      itemsCount: questionnaireRegistry.phq9.items.length,
+      scale: {
+        min: questionnaireRegistry.phq9.scale.min,
+        max: questionnaireRegistry.phq9.scale.max,
+      },
+    },
+    { status: 200, headers: { "Cache-Control": "no-store" } }
+  );
 }

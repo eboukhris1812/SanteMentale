@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import {
+  generateHuggingFaceReport,
   generateNaturalReport,
   scoreQuestionnaire,
   type AssessmentResults,
@@ -112,63 +113,86 @@ export async function POST(request: Request) {
         pcl5Short,
         miniToc,
       },
+      itemScores: {
+        phq9: payload.phq9,
+        gad7: payload.gad7,
+        pcl5Short: payload.pcl5Short,
+        miniToc: payload.miniToc,
+        personalityScreen: payload.personalityScreen,
+        eatingScreen: payload.eatingScreen,
+        neurodevScreen: payload.neurodevScreen,
+      },
       categoryScores: dominantMap,
       dominantCategories,
       dominantCategory,
     };
 
-    const naturalReport = generateNaturalReport(results);
+    const localNaturalReport = generateNaturalReport(results);
+    const aiStartedAt = Date.now();
+    const aiGeneration = await generateHuggingFaceReport(results);
+    const aiDurationMs = Date.now() - aiStartedAt;
+    console.info(
+      `[ai-report] source=${aiGeneration.source} cached=${aiGeneration.cached} durationMs=${aiDurationMs}`
+    );
+    if (process.env.NODE_ENV === "production" && aiGeneration.source === "fallback") {
+      console.warn(`[ai-report] fallback used in production: ${aiGeneration.error ?? "unknown"}`);
+    }
 
     const phq9Item9 = payload.phq9[8] ?? 0;
     const urgentSupportRecommended = phq9Item9 >= 1;
 
-    return NextResponse.json(
-      {
-        results,
-        dominantCategories,
-        dominantCategory,
-        naturalReport,
-        // Backward-compatible aliases to avoid breaking existing frontend code during migration.
-        scores: results.scores,
-        categoryScores: results.categoryScores,
-        methodology: {
-          framework: "dépistage psychométrique éducatif pour projet academique IB",
-          scoringMethod:
-            "Somme simple des items calculee cote serveur (questionnaires valides + ecrans d'orientation categories).",
-          ageTarget: "Adolescents 14-18 ans",
-          limitations: [
-            "Outil de dépistage uniquement: ne pose pas de diagnostic clinique.",
-            "Les seuils peuvent varier selon la population, la langue et le contexte.",
-            "PCL-5 court et Mini-TOC (style OCI-4) sont indicatifs et non diagnostiques seuls.",
-            "Personnalite, conduites alimentaires et neurodeveloppement sont actuellement estimes par des ecrans d'orientation courts.",
-          ],
-          sources: [
-            "PHQ-9: Kroenke K, Spitzer RL, Williams JBW. J Gen Intern Med. 2001;16(9):606-613.",
-            "GAD-7: Spitzer RL, Kroenke K, Williams JBW, Lowe B. Arch Intern Med. 2006;166(10):1092-1097.",
-            "PCL-5 (20 items): recommandations VA/NCPTSD; seuils courts variables selon les études.",
-            "OCI-4 court: Abramovitch A et al. J Obsessive Compuls Relat Disord. 2021;31:100696.",
-          ],
-        },
-        safety: {
-          educationalPurposeOnly: true,
-          emergencyDisclaimer:
-            "En cas de danger immediat, contacte sans attendre les services d'urgence locaux.",
-          urgentSupportRecommended,
-          urgentSupportReason:
-            urgentSupportRecommended
-              ? "L'item 9 du PHQ-9 est superieur a 0: parle rapidement a un adulte de confiance ou a un professionnel de santé."
-              : "Aucun signal critique immediat detecte sur l'item 9 du PHQ-9.",
-        },
+    const responsePayload: Record<string, unknown> = {
+      results,
+      dominantCategories,
+      dominantCategory,
+      naturalReport: localNaturalReport,
+      aiReport: aiGeneration.text,
+      aiReportSource: aiGeneration.source,
+      aiReportCached: aiGeneration.cached,
+      scores: results.scores,
+      categoryScores: results.categoryScores,
+      methodology: {
+        framework: "depistage psychometrique educatif pour projet academique IB",
+        scoringMethod:
+          "Somme simple des items calculee cote serveur (questionnaires valides + ecrans d'orientation categories).",
+        ageTarget: "Tous ages",
+        limitations: [
+          "Outil de depistage uniquement: ne pose pas de diagnostic clinique.",
+          "Les seuils peuvent varier selon la population, la langue et le contexte.",
+          "PCL-5 court et Mini-TOC (style OCI-4) sont indicatifs et non diagnostiques seuls.",
+          "Personnalite, conduites alimentaires et neurodeveloppement sont actuellement estimes par des ecrans d'orientation courts.",
+        ],
+        sources: [
+          "PHQ-9: Kroenke K, Spitzer RL, Williams JBW. J Gen Intern Med. 2001;16(9):606-613.",
+          "GAD-7: Spitzer RL, Kroenke K, Williams JBW, Lowe B. Arch Intern Med. 2006;166(10):1092-1097.",
+          "PCL-5 (20 items): recommandations VA/NCPTSD; seuils courts variables selon les etudes.",
+          "OCI-4 court: Abramovitch A et al. J Obsessive Compuls Relat Disord. 2021;31:100696.",
+        ],
       },
-      {
-        status: 200,
-        headers: {
-          "Cache-Control": "no-store",
-          "X-RateLimit-Remaining": String(rateLimit.remaining),
-          "X-RateLimit-Reset": String(rateLimit.resetInSeconds),
-        },
-      }
-    );
+      safety: {
+        educationalPurposeOnly: true,
+        emergencyDisclaimer:
+          "En cas de danger immediat, contacte sans attendre les services d'urgence locaux.",
+        urgentSupportRecommended,
+        urgentSupportReason:
+          urgentSupportRecommended
+            ? "L'item 9 du PHQ-9 est superieur a 0: parle rapidement a un adulte de confiance ou a un professionnel de sante."
+            : "Aucun signal critique immediat detecte sur l'item 9 du PHQ-9.",
+      },
+    };
+
+    if (process.env.NODE_ENV !== "production" && aiGeneration.error) {
+      responsePayload.aiReportError = aiGeneration.error;
+    }
+
+    return NextResponse.json(responsePayload, {
+      status: 200,
+      headers: {
+        "Cache-Control": "no-store",
+        "X-RateLimit-Remaining": String(rateLimit.remaining),
+        "X-RateLimit-Reset": String(rateLimit.resetInSeconds),
+      },
+    });
   } catch (error) {
     if (error instanceof Error && "name" in error && error.name === "ZodError") {
       return NextResponse.json(
@@ -178,10 +202,6 @@ export async function POST(request: Request) {
     }
 
     console.error("/api/bilans POST failed", error);
-    return NextResponse.json(
-      { error: "Erreur interne du serveur" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
   }
 }
-

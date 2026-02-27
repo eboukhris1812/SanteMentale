@@ -6,7 +6,10 @@
     "dev": "next dev --webpack",
         "build": "next build",
         "start": "next start",
-        "lint": "eslint"
+        "lint": "eslint",
+        "test:profiles": "node scripts/test-ai-profiles.mjs",
+        "test:specific-profiles": "node scripts/test-specific-ai-profiles.mjs",
+        "test:all-test-slugs": "node scripts/test-all-test-slugs-ai.mjs"
     },
     "dependencies": {
         "@prisma/client": "^6.19.2",

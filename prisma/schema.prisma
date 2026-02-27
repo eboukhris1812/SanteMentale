@@ -28,3 +28,13 @@ model Bilan {
   niveau    String
   dominante String?
 }
+
+model AiReportCache {
+  profileHash String   @id
+  reportText  String
+  source      String
+  error       String?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import {
+  generateHuggingFaceSpecificReport,
   generateSpecificTestReport,
   scoreQuestionnaire,
 } from "@/features/assessment/engine";
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { error: "Limite de requêtes atteinte" },
+        { error: "Limite de requetes atteinte" },
         {
           status: 429,
           headers: {
@@ -36,20 +37,32 @@ export async function POST(request: Request) {
     const payload = specificTestPayloadSchemas.pcl5Short.parse(await request.json());
     const score = scoreQuestionnaire(questionnaireRegistry.pcl5Short, payload.answers);
     const naturalReport = generateSpecificTestReport("pcl5Short", score);
+    const aiGeneration = await generateHuggingFaceSpecificReport(
+      "pcl5Short",
+      score,
+      payload.answers,
+      false
+    );
 
     return NextResponse.json(
       {
         testId: "pcl5Short",
         score,
         naturalReport,
+        aiReport: aiGeneration.text,
+        aiReportSource: aiGeneration.source,
+        aiReportCached: aiGeneration.cached,
+        ...(process.env.NODE_ENV !== "production" && aiGeneration.error
+          ? { aiReportError: aiGeneration.error }
+          : {}),
         methodology: {
-          framework: "Dépistage psychométrique éducatif (projet IB)",
+          framework: "Depistage psychometrique educatif (projet IB)",
           source: questionnaireRegistry.pcl5Short.scoringRules.source,
           educationalPurposeOnly: true,
         },
         safety: {
           urgentSupportRecommended: false,
-          urgentSupportReason: "Aucune règle de signal critique immédiat n'est définie pour ce test.",
+          urgentSupportReason: "Aucune regle de signal critique immediat n'est definie pour ce test.",
         },
       },
       {
@@ -63,10 +76,25 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     if (error instanceof Error && "name" in error && error.name === "ZodError") {
-      return NextResponse.json({ error: "Format de données invalide" }, { status: 400 });
+      return NextResponse.json({ error: "Format de donnees invalide" }, { status: 400 });
     }
 
     console.error("/api/tests/pcl5-court POST failed", error);
     return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
   }
+}
+
+export async function GET() {
+  return NextResponse.json(
+    {
+      testId: "pcl5Short",
+      slug: "pcl5-court",
+      itemsCount: questionnaireRegistry.pcl5Short.items.length,
+      scale: {
+        min: questionnaireRegistry.pcl5Short.scale.min,
+        max: questionnaireRegistry.pcl5Short.scale.max,
+      },
+    },
+    { status: 200, headers: { "Cache-Control": "no-store" } }
+  );
 }

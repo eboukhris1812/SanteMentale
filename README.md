@@ -20,6 +20,26 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Environment Variables
+
+Create a `.env` file at project root with:
+
+```bash
+DATABASE_URL="postgresql://..."
+HUGGINGFACE_API_KEY="hf_..."
+HUGGINGFACE_MODEL="moonshotai/Kimi-K2-Instruct-0905"
+HUGGINGFACE_MAX_NEW_TOKENS="420"
+```
+
+Notes:
+- `HUGGINGFACE_API_KEY` is required for IA report generation.
+- If Hugging Face is unavailable, the API falls back to the deterministic local report.
+- `HUGGINGFACE_MODEL` must be a chat-capable model for the `/v1/chat/completions` endpoint.
+
+### Vercel setup
+
+In Vercel: `Project Settings -> Environment Variables`, add the same keys for `Production`, `Preview`, and `Development`, then redeploy.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

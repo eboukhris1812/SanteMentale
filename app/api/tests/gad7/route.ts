@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import {
+  generateHuggingFaceSpecificReport,
   generateSpecificTestReport,
   scoreQuestionnaire,
 } from "@/features/assessment/engine";
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { error: "Limite de requêtes atteinte" },
+        { error: "Limite de requetes atteinte" },
         {
           status: 429,
           headers: {
@@ -36,20 +37,32 @@ export async function POST(request: Request) {
     const payload = specificTestPayloadSchemas.gad7.parse(await request.json());
     const score = scoreQuestionnaire(questionnaireRegistry.gad7, payload.answers);
     const naturalReport = generateSpecificTestReport("gad7", score);
+    const aiGeneration = await generateHuggingFaceSpecificReport(
+      "gad7",
+      score,
+      payload.answers,
+      false
+    );
 
     return NextResponse.json(
       {
         testId: "gad7",
         score,
         naturalReport,
+        aiReport: aiGeneration.text,
+        aiReportSource: aiGeneration.source,
+        aiReportCached: aiGeneration.cached,
+        ...(process.env.NODE_ENV !== "production" && aiGeneration.error
+          ? { aiReportError: aiGeneration.error }
+          : {}),
         methodology: {
-          framework: "Dépistage psychométrique éducatif (projet IB)",
+          framework: "Depistage psychometrique educatif (projet IB)",
           source: questionnaireRegistry.gad7.scoringRules.source,
           educationalPurposeOnly: true,
         },
         safety: {
           urgentSupportRecommended: false,
-          urgentSupportReason: "Aucune règle de signal critique immédiat n'est définie pour ce test.",
+          urgentSupportReason: "Aucune regle de signal critique immediat n'est definie pour ce test.",
         },
       },
       {
@@ -63,10 +76,25 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     if (error instanceof Error && "name" in error && error.name === "ZodError") {
-      return NextResponse.json({ error: "Format de données invalide" }, { status: 400 });
+      return NextResponse.json({ error: "Format de donnees invalide" }, { status: 400 });
     }
 
     console.error("/api/tests/gad7 POST failed", error);
     return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
   }
+}
+
+export async function GET() {
+  return NextResponse.json(
+    {
+      testId: "gad7",
+      slug: "gad7",
+      itemsCount: questionnaireRegistry.gad7.items.length,
+      scale: {
+        min: questionnaireRegistry.gad7.scale.min,
+        max: questionnaireRegistry.gad7.scale.max,
+      },
+    },
+    { status: 200, headers: { "Cache-Control": "no-store" } }
+  );
 }
