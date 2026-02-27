@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { repairFrenchText } from "@/lib/text/repairFrenchText";
 
 type QuestionnaireId =
   | "phq9"
@@ -414,7 +415,9 @@ export default function BilanGlobal() {
           </div>
         </div>
 
-        <h2 className="text-xl font-semibold leading-8 text-slate-900 md:text-2xl md:leading-9">{currentQuestion.text}</h2>
+        <h2 className="text-xl font-semibold leading-8 text-slate-900 md:text-2xl md:leading-9">
+          {repairFrenchText(currentQuestion.text)}
+        </h2>
 
         <div className="mt-6 grid gap-3">
           {currentQuestion.choices.map((label, value) => (
@@ -423,7 +426,7 @@ export default function BilanGlobal() {
               onClick={() => handleAnswer(value)}
               className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:bg-cyan-50/50 hover:text-slate-900 md:text-base"
             >
-              {label}
+              {repairFrenchText(label)}
             </button>
           ))}
         </div>

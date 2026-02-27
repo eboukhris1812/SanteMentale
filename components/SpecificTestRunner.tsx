@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { QuestionnaireScore } from "@/features/assessment/engine";
 import { questionnaireRegistry } from "@/features/assessment/schemas";
+import { repairFrenchText } from "@/lib/text/repairFrenchText";
 
 type QuestionnaireId = keyof typeof questionnaireRegistry;
 
@@ -319,7 +320,7 @@ export default function SpecificTestRunner({
             <div className="space-y-3">
               {aiReportParagraphs.map((paragraph, index) => (
                 <p key={`${index}-${paragraph.slice(0, 24)}`} className="text-sm text-emerald-950">
-                  {paragraph}
+                  {repairFrenchText(paragraph)}
                 </p>
               ))}
             </div>
@@ -329,10 +330,10 @@ export default function SpecificTestRunner({
         {!result.aiReport && result.naturalReport && (
           <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3">
             <p className="font-semibold text-emerald-900">Synthèse de ton évaluation</p>
-            <p className="text-sm text-emerald-950">{result.naturalReport.introduction}</p>
+            <p className="text-sm text-emerald-950">{repairFrenchText(result.naturalReport.introduction)}</p>
             <div className="space-y-1">
               <p className="text-sm font-semibold text-emerald-900">Résumé émotionnel</p>
-              <p className="text-sm text-emerald-950">{result.naturalReport.emotionalSummary}</p>
+              <p className="text-sm text-emerald-950">{repairFrenchText(result.naturalReport.emotionalSummary)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm font-semibold text-emerald-900">
@@ -340,7 +341,7 @@ export default function SpecificTestRunner({
                   ? "Focus sur la catégorie dominante"
                   : "Focus général"}
               </p>
-              <p className="text-sm text-emerald-950">{result.naturalReport.dominantFocus}</p>
+              <p className="text-sm text-emerald-950">{repairFrenchText(result.naturalReport.dominantFocus)}</p>
             </div>
           </div>
         )}
@@ -469,7 +470,7 @@ export default function SpecificTestRunner({
         Question {current + 1} / {definition.items.length}
       </p>
 
-      <h2 className="text-lg font-semibold">{currentItem.prompt}</h2>
+      <h2 className="text-lg font-semibold">{repairFrenchText(currentItem.prompt)}</h2>
 
       <div className="grid gap-2">
         {options.map((option) => (
@@ -479,7 +480,7 @@ export default function SpecificTestRunner({
             disabled={submitting}
             className="p-3 border rounded hover:bg-blue-50 disabled:opacity-60"
           >
-            {option.label}
+            {repairFrenchText(option.label)}
           </button>
         ))}
       </div>

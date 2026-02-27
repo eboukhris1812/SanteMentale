@@ -34,7 +34,7 @@ const DEFAULT_MAX_NEW_TOKENS = 600;
 const HF_MAX_RETRIES = 2;
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24;
 const REPORT_CACHE_MAX_ITEMS = 500;
-const CACHE_VERSION = "specific-hf-v3";
+const CACHE_VERSION = "specific-hf-v5";
 const reportCache = new Map<string, CacheEntry>();
 
 type FallbackBand = "light" | "moderate" | "high";
@@ -205,6 +205,7 @@ function buildPromptForHuggingFaceSpecific(
     "Redige un rapport unique, personalise, synthetique, scientifique et bienveillant en francais.",
     "Interdictions: aucune repetition, aucun score brut, aucun diagnostic certain, aucun titre, aucune mention d'entretien clinique.",
     "Interdictions supplementaires: ne jamais inventer l'age, ne jamais dire 'votre enfant', ne jamais inventer des informations familiales ou scolaires.",
+    "Style obligatoire: s'adresser directement a la personne en disant uniquement 'vous'.",
     "Structure obligatoire en 7 paragraphes dans cet ordre: introduction, synthese emotionnelle/symptomes, focus du test, psychoeducation, recommandations concretes, encouragement, avertissement ethique.",
     "Format strict: exactement 7 paragraphes separes par une ligne vide (\\n\\n).",
   ].join("\n");
@@ -220,6 +221,10 @@ function sanitizeOutput(text: string): string {
     .replace(/\bvotre adolescent\b/gi, "vous")
     .replace(/\bson enfant\b/gi, "vous")
     .replace(/\bles parents\b/gi, "la personne")
+    .replace(/\bcafeenergy\b/gi, "cafeine et boissons energisantes")
+    .replace(/\bcafenergy\b/gi, "cafeine et boissons energisantes")
+    .replace(/\bcafénergy\b/gi, "cafeine et boissons energisantes")
+    .replace(/\bcaféenergy\b/gi, "cafeine et boissons energisantes")
     .replace(/:\s*1\.\s*/g, ": 1. ")
     .replace(/\s+2\.\s*$/g, " ")
     .replace(/\s{3,}/g, " ")
@@ -239,7 +244,14 @@ function looksTruncatedParagraph(paragraph: string): boolean {
   if (!/[.!?]"?$/.test(p)) return true;
   if (/\b(ou vous|ce qui|afin de|pour que|puis)\s*$/i.test(p)) return true;
   if (/\b\d+\.\s*$/i.test(p)) return true;
+  if (/\b(a|au|aux|de|des|du|pour|vers|avec|dans|sur|chez|par)\s*$/i.test(p)) return true;
   return false;
+}
+
+function removeDanglingTail(paragraph: string): string {
+  return paragraph
+    .replace(/\s+(a|au|aux|de|des|du|pour|vers|avec|dans|sur|chez|par)\s*$/i, "")
+    .trim();
 }
 
 function normalizeParagraphQuality(text: string): string {
@@ -252,7 +264,13 @@ function normalizeParagraphQuality(text: string): string {
   const enriched = [...paragraphs];
   for (let i = 0; i < enriched.length; i += 1) {
     const paragraph = enriched[i] ?? "";
-    if (!looksTruncatedParagraph(paragraph)) continue;
+    const cleanedParagraph = removeDanglingTail(paragraph);
+    if (!looksTruncatedParagraph(cleanedParagraph)) {
+      if (cleanedParagraph !== paragraph) {
+        enriched[i] = cleanedParagraph;
+      }
+      continue;
+    }
 
     if (i >= enriched.length - 2) {
       enriched[i] =
@@ -310,7 +328,10 @@ function enforceFactualConsistency(testId: string, score: QuestionnaireScore, te
   let fixed = text
     .replace(/\bvotre enfant\b/gi, "vous")
     .replace(/\bvotre adolescent\b/gi, "vous")
-    .replace(/\bson enfant\b/gi, "vous");
+    .replace(/\bson enfant\b/gi, "vous")
+    .replace(/\bvous presentez un trouble\b/gi, "le profil actuel suggere des difficultes a explorer")
+    .replace(/\bconfirme un trouble\b/gi, "suggere un signal clinique a explorer")
+    .replace(/\bdiagnostic de\b/gi, "hypothese clinique de");
 
   if (testId === "mdq") {
     const officialPositive = Number(score.components?.officialPositiveScreen ?? -1);
@@ -336,6 +357,81 @@ function enforceFactualConsistency(testId: string, score: QuestionnaireScore, te
   }
 
   return fixed;
+}
+
+function standardSpecificRecommendations(band: FallbackBand): string {
+  if (band === "high") {
+    return "Priorisez 3 actions simples pendant 7 jours: horaires de sommeil reguliers, reduction des facteurs de surcharge en soiree, et prise de rendez-vous avec un professionnel de sante mentale dans un delai court.";
+  }
+  if (band === "moderate") {
+    return "Mettez en place un plan sur 2 semaines avec routines stables (sommeil, activite physique moderee, respiration lente), puis reevaluez l'evolution des symptomes.";
+  }
+  return "Maintenez des habitudes protectrices: sommeil regulier, activite physique douce, temps d'ecran limite en fin de journee et points de pause dans la semaine.";
+}
+
+function standardSpecificEncouragement(band: FallbackBand): string {
+  if (band === "high") {
+    return "Une amelioration reste possible meme si la charge actuelle est importante. Un accompagnement structure augmente nettement les chances de stabilisation.";
+  }
+  if (band === "moderate") {
+    return "Des progres concrets sont possibles avec de la regularite. Chaque petit ajustement utile renforce votre sentiment de maitrise.";
+  }
+  return "Vous disposez deja de ressources utiles. En restant regulier dans vos routines, vous pouvez consolider cet equilibre.";
+}
+
+function standardSpecificEthical(
+  band: FallbackBand,
+  urgentSupportRecommended: boolean
+): string {
+  if (urgentSupportRecommended || band === "high") {
+    return "Ce test reste un outil d'orientation et ne remplace pas une evaluation clinique. Si la detresse augmente, si vous vous sentez en risque, ou si des idees de mort apparaissent, contactez sans attendre un professionnel ou les services d'urgence.";
+  }
+  return "Ce test reste un outil d'orientation et ne remplace pas une evaluation clinique. Si la gene augmente ou devient invalidante, parlez-en rapidement avec un professionnel de sante.";
+}
+
+function isActionableParagraph(paragraph: string): boolean {
+  return /(commencez|planifiez|notez|pratiquez|maintenez|fixez|reduisez|augmentez|evitez|organisez|mettez|consacrez|sommeil|respiration|activite)/i.test(
+    paragraph
+  );
+}
+
+function isEncouragementParagraph(paragraph: string): boolean {
+  return /(possible|progres|ressource|capacite|amelioration|chaque pas|confiance|soutien|stabilisation)/i.test(
+    paragraph
+  );
+}
+
+function enforceSpecificParagraphRoles(
+  text: string,
+  score: QuestionnaireScore,
+  urgentSupportRecommended: boolean
+): string {
+  const band = inferFallbackBand(score);
+  const paragraphs = text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
+
+  const normalized = [...paragraphs];
+  while (normalized.length < 7) {
+    normalized.push("Ce test reste un outil d'orientation et ne remplace pas une evaluation clinique.");
+  }
+  const seven = normalized.slice(0, 7);
+
+  // Paragraph 5: practical recommendations
+  if (!isActionableParagraph(seven[4] ?? "")) {
+    seven[4] = standardSpecificRecommendations(band);
+  }
+
+  // Paragraph 6: encouragement
+  if (!isEncouragementParagraph(seven[5] ?? "")) {
+    seven[5] = standardSpecificEncouragement(band);
+  }
+
+  // Paragraph 7: ethical warning
+  seven[6] = standardSpecificEthical(band, urgentSupportRecommended);
+
+  return seven.join("\n\n");
 }
 
 async function callHuggingFace(prompt: string): Promise<string> {
@@ -445,14 +541,18 @@ export async function generateHuggingFaceSpecificReport(
   const prompt = buildPromptForHuggingFaceSpecific(testId, score, answers, urgentSupportRecommended);
   try {
     const generated = await callHuggingFace(prompt);
-    const report = normalizeParagraphQuality(
-      normalizeParagraphs(
-        enforceFactualConsistency(
-          testId,
-          score,
-          ensureCompleteEnding(normalizeParagraphs(sanitizeOutput(generated)))
+    const report = enforceSpecificParagraphRoles(
+      normalizeParagraphQuality(
+        normalizeParagraphs(
+          enforceFactualConsistency(
+            testId,
+            score,
+            ensureCompleteEnding(normalizeParagraphs(sanitizeOutput(generated)))
+          )
         )
-      )
+      ),
+      score,
+      urgentSupportRecommended
     );
     if (!report) throw new Error("Empty generated report");
 

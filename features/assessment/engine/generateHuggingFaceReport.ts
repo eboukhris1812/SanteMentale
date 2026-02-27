@@ -39,7 +39,7 @@ const DEFAULT_MAX_NEW_TOKENS = 420;
 const HF_MAX_RETRIES = 2;
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24;
 const REPORT_CACHE_MAX_ITEMS = 500;
-const CACHE_VERSION = "hf-chat-v3";
+const CACHE_VERSION = "hf-chat-v4";
 const reportCache = new Map<string, CacheEntry>();
 
 function categoryLabel(category: DominantCategory): string {
@@ -191,6 +191,8 @@ export function buildPromptForHuggingFace(results: AssessmentResults): string {
     "Redige un rapport unique, personnalise, synthetique, scientifique et bienveillant en francais.",
     "Interdictions: aucune repetition, aucun score brut, aucun diagnostic certain, aucun titre.",
     "Interdictions supplementaires: ne jamais mentionner un entretien clinique, une consultation deja faite, ou des informations non presentes dans les questionnaires.",
+    "Interdictions supplementaires: ne jamais inventer l'age, ne jamais dire 'votre enfant', ne jamais inventer des informations familiales ou scolaires.",
+    "Style obligatoire: s'adresser directement a la personne en disant uniquement 'vous'.",
     "Structure obligatoire en 7 paragraphes dans cet ordre: introduction, synthese emotionnelle/symptomes, focus categories dominantes, psychoeducation, recommandations concretes, encouragement, avertissement ethique.",
     "Format strict: produire exactement 7 paragraphes separes par une ligne vide (\\n\\n) et rien d'autre.",
     "Chaque paragraphe doit se terminer par une phrase complete avec ponctuation finale.",
@@ -213,6 +215,14 @@ function sanitizeOutput(text: string): string {
     )
     .replace(/\b(PHQ-?9|GAD-?7|PCL-?5|TOC|EAT-?26)\s*[:=]?\s*\d+\s*(\/\s*\d+)?/gi, "")
     .replace(/\b(entretien clinique|entretien|consultation deja faite)\b/gi, "questionnaire")
+    .replace(/\bvotre enfant\b/gi, "vous")
+    .replace(/\bvotre adolescent\b/gi, "vous")
+    .replace(/\bson enfant\b/gi, "vous")
+    .replace(/\bles parents\b/gi, "la personne")
+    .replace(/\bcafeenergy\b/gi, "cafeine et boissons energisantes")
+    .replace(/\bcafenergy\b/gi, "cafeine et boissons energisantes")
+    .replace(/\bcafénergy\b/gi, "cafeine et boissons energisantes")
+    .replace(/\bcaféenergy\b/gi, "cafeine et boissons energisantes")
     .replace(
       /\s*Ces elements peuvent evoluer favorablement avec un accompagnement adapte\.\s*/gi,
       " "
@@ -225,8 +235,18 @@ function sanitizeOutput(text: string): string {
     .trim();
 }
 
+function enforceGlobalConsistency(text: string): string {
+  return text
+    .replace(/\bvotre enfant\b/gi, "vous")
+    .replace(/\bvotre adolescent\b/gi, "vous")
+    .replace(/\bson enfant\b/gi, "vous")
+    .replace(/\bvous presentez un trouble\b/gi, "le profil actuel suggere des difficultes a explorer")
+    .replace(/\bconfirme un trouble\b/gi, "suggere un signal clinique a explorer")
+    .replace(/\bdiagnostic de\b/gi, "hypothese clinique de");
+}
+
 function ensureCompleteEnding(text: string): string {
-  const trimmed = text.trim();
+  const trimmed = text.trim().replace(/\s+[a-z]{1,4}$/i, "");
   if (!trimmed) {
     return trimmed;
   }
@@ -244,7 +264,14 @@ function looksTruncatedParagraph(paragraph: string): boolean {
   if (!p) return true;
   if (!/[.!?]"?$/.test(p)) return true;
   if (/\b(envoie alors|lorsqu'|ce qui|afin de|pour que)\s*$/i.test(p)) return true;
+  if (/\b(a|au|aux|de|des|du|pour|vers|avec|dans|sur|chez|par)\s*$/i.test(p)) return true;
   return false;
+}
+
+function removeDanglingTail(paragraph: string): string {
+  return paragraph
+    .replace(/\s+(a|au|aux|de|des|du|pour|vers|avec|dans|sur|chez|par)\s*$/i, "")
+    .trim();
 }
 
 function normalizeParagraphQuality(text: string, results: AssessmentResults): string {
@@ -265,7 +292,8 @@ function normalizeParagraphQuality(text: string, results: AssessmentResults): st
 
   for (let i = 0; i < enriched.length; i += 1) {
     const paragraph = enriched[i] ?? "";
-    if (looksTruncatedParagraph(paragraph)) {
+    const cleanedParagraph = removeDanglingTail(paragraph);
+    if (looksTruncatedParagraph(cleanedParagraph)) {
       if (i >= enriched.length - 2) {
         enriched[i] =
           urgentSignal || globalIndex >= 0.45
@@ -275,10 +303,33 @@ function normalizeParagraphQuality(text: string, results: AssessmentResults): st
         enriched[i] =
           "Ces manifestations restent ajustables avec des strategies progressives. Un accompagnement adapte peut aider a consolider ces changements dans la duree.";
       }
+    } else if (cleanedParagraph !== paragraph) {
+      enriched[i] = cleanedParagraph;
     }
   }
 
   return enriched.join("\n\n");
+}
+
+function standardEthicalParagraph(results: AssessmentResults): string {
+  const values = Object.values(results.categoryScores);
+  const globalIndex = values.length > 0 ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+  const urgentSignal = (results.itemScores?.phq9?.[8] ?? 0) >= 1;
+  if (urgentSignal || globalIndex >= 0.45) {
+    return "Ce bilan reste un outil d'orientation et ne remplace pas une evaluation clinique. En cas de detresse importante ou d'idees de vous faire du mal, contactez rapidement un professionnel de sante ou les services d'urgence.";
+  }
+  return "Ce bilan reste un outil d'orientation et ne remplace pas une evaluation clinique. Si vos difficultes augmentent dans les prochaines semaines, parlez-en avec un professionnel de sante pour etre accompagne de facon adaptee.";
+}
+
+function enforceFinalEthicalParagraph(text: string, results: AssessmentResults): string {
+  const paragraphs = text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
+  if (paragraphs.length === 0) return standardEthicalParagraph(results);
+  const normalized = ensureMinimumParagraphs(paragraphs, 7);
+  normalized[6] = standardEthicalParagraph(results);
+  return normalized.join("\n\n");
 }
 
 function normalizeParagraphs(text: string): string {
@@ -470,9 +521,13 @@ export async function generateHuggingFaceReport(
 
   try {
     const generated = await callHuggingFace(prompt);
-    const report = normalizeParagraphQuality(
-      ensureCompleteEnding(normalizeParagraphs(sanitizeOutput(stripPromptEcho(generated, prompt))))
-      ,
+    const report = enforceFinalEthicalParagraph(
+      normalizeParagraphQuality(
+        ensureCompleteEnding(
+          normalizeParagraphs(enforceGlobalConsistency(sanitizeOutput(stripPromptEcho(generated, prompt))))
+        ),
+        results
+      ),
       results
     );
     if (!report) {

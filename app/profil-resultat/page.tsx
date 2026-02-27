@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { repairFrenchText } from "@/lib/text/repairFrenchText";
 
 type Interpretation = {
   label: string;
@@ -321,6 +322,17 @@ export default function Resultats() {
       .filter((paragraph) => paragraph.length > 0);
   }, [result]);
 
+  const recommendedDominants = useMemo(() => {
+    if (!result) return [] as Array<Exclude<ApiResult["dominantCategory"], null>>;
+    if (result.dominantCategories.length === 0) return [] as Array<Exclude<ApiResult["dominantCategory"], null>>;
+    return [...result.dominantCategories]
+      .sort(
+        (a, b) =>
+          (result.results.categoryScores[b] ?? 0) - (result.results.categoryScores[a] ?? 0)
+      )
+      .slice(0, 3);
+  }, [result]);
+
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow">
@@ -398,31 +410,31 @@ export default function Resultats() {
         <div className="space-y-3">
           {aiReportParagraphs.map((paragraph, index) => (
             <p key={`${index}-${paragraph.slice(0, 24)}`} className="text-sm text-emerald-950">
-              {paragraph}
+              {repairFrenchText(paragraph)}
             </p>
           ))}
         </div>
       </div>
 
-      {result.dominantCategory && result.dominantCategories.length === 1 && (
+      {recommendedDominants.length === 1 && (
         <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
           <p className="font-semibold mb-1">Étape suivante recommandée</p>
           <p className="text-sm text-gray-700 mb-3">
-            Continue avec un test ciblé ({orientationMap[result.dominantCategory].specificTestName})
+            Continue avec un test ciblé ({orientationMap[recommendedDominants[0]].specificTestName})
             ou consulte la fiche explicative associée.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
               href={withRecommendationParams(
-                orientationMap[result.dominantCategory].specificTestHref,
-                result.dominantCategory
+                orientationMap[recommendedDominants[0]].specificTestHref,
+                recommendedDominants[0]
               )}
               className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700"
             >
               Aller au test spécifique
             </Link>
             <Link
-              href={orientationMap[result.dominantCategory].troubleSheetHref}
+              href={orientationMap[recommendedDominants[0]].troubleSheetHref}
               className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-50"
             >
               Voir la fiche trouble
@@ -430,6 +442,47 @@ export default function Resultats() {
             <Link
               href="/bilan-global"
               className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-50"
+            >
+              Refaire le bilan
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {recommendedDominants.length > 1 && (
+        <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+          <p className="font-semibold mb-1">Étapes suivantes recommandées</p>
+          <p className="text-sm text-gray-700 mb-3">
+            Plusieurs dimensions ressortent. Choisis 2 a 3 tests cibles pour affiner le bilan.
+          </p>
+          <div className="grid gap-3 md:grid-cols-2">
+            {recommendedDominants.map((category) => (
+              <div key={category} className="rounded-lg border border-indigo-200 bg-white p-3 space-y-2">
+                <p className="font-medium text-indigo-900">{dominantLabelMap[category]}</p>
+                <p className="text-sm text-gray-700">
+                  Test recommande: {orientationMap[category].specificTestName}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    href={withRecommendationParams(orientationMap[category].specificTestHref, category)}
+                    className="px-3 py-1.5 rounded bg-indigo-600 text-white text-sm hover:bg-indigo-700"
+                  >
+                    Lancer le test
+                  </Link>
+                  <Link
+                    href={orientationMap[category].troubleSheetHref}
+                    className="px-3 py-1.5 rounded border border-gray-300 text-sm hover:bg-gray-50"
+                  >
+                    Fiche trouble
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3">
+            <Link
+              href="/bilan-global"
+              className="inline-block px-4 py-2 rounded border border-gray-300 hover:bg-gray-50"
             >
               Refaire le bilan
             </Link>
