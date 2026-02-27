@@ -38,12 +38,18 @@ export async function POST(request: Request) {
     const score = scoreQuestionnaire(questionnaireRegistry.phq9, payload.answers);
     const naturalReport = generateSpecificTestReport("phq9", score);
     const urgentSupportRecommended = (payload.answers[8] ?? 0) >= 1;
+    const aiStartedAt = Date.now();
     const aiGeneration = await generateHuggingFaceSpecificReport(
       "phq9",
       score,
       payload.answers,
       urgentSupportRecommended
     );
+    const aiDurationMs = Date.now() - aiStartedAt;
+    console.info(`[ai-report-specific] test=phq9 source=${aiGeneration.source} cached=${aiGeneration.cached} durationMs=${aiDurationMs}`);
+    if (process.env.NODE_ENV === "production" && aiGeneration.source === "fallback") {
+      console.warn(`[ai-report-specific] fallback used in production for test=phq9: ${aiGeneration.error ?? "unknown"}`);
+    }
 
     return NextResponse.json(
       {
@@ -101,3 +107,4 @@ export async function GET() {
     { status: 200, headers: { "Cache-Control": "no-store" } }
   );
 }
+

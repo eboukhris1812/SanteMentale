@@ -37,12 +37,18 @@ export async function POST(request: Request) {
     const payload = specificTestPayloadSchemas.pcl5Short.parse(await request.json());
     const score = scoreQuestionnaire(questionnaireRegistry.pcl5Short, payload.answers);
     const naturalReport = generateSpecificTestReport("pcl5Short", score);
+    const aiStartedAt = Date.now();
     const aiGeneration = await generateHuggingFaceSpecificReport(
       "pcl5Short",
       score,
       payload.answers,
       false
     );
+    const aiDurationMs = Date.now() - aiStartedAt;
+    console.info(`[ai-report-specific] test=pcl5Short source=${aiGeneration.source} cached=${aiGeneration.cached} durationMs=${aiDurationMs}`);
+    if (process.env.NODE_ENV === "production" && aiGeneration.source === "fallback") {
+      console.warn(`[ai-report-specific] fallback used in production for test=pcl5Short: ${aiGeneration.error ?? "unknown"}`);
+    }
 
     return NextResponse.json(
       {
@@ -98,3 +104,4 @@ export async function GET() {
     { status: 200, headers: { "Cache-Control": "no-store" } }
   );
 }
+

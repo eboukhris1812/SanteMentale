@@ -73,6 +73,11 @@ export async function POST(
     console.info(
       `[ai-report-specific] test=${definition.id} source=${aiGeneration.source} cached=${aiGeneration.cached} durationMs=${aiDurationMs}`
     );
+    if (process.env.NODE_ENV === "production" && aiGeneration.source === "fallback") {
+      console.warn(
+        `[ai-report-specific] fallback used in production for test=${definition.id}: ${aiGeneration.error ?? "unknown"}`
+      );
+    }
 
     return NextResponse.json(
       {

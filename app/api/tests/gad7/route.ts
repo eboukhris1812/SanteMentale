@@ -37,12 +37,18 @@ export async function POST(request: Request) {
     const payload = specificTestPayloadSchemas.gad7.parse(await request.json());
     const score = scoreQuestionnaire(questionnaireRegistry.gad7, payload.answers);
     const naturalReport = generateSpecificTestReport("gad7", score);
+    const aiStartedAt = Date.now();
     const aiGeneration = await generateHuggingFaceSpecificReport(
       "gad7",
       score,
       payload.answers,
       false
     );
+    const aiDurationMs = Date.now() - aiStartedAt;
+    console.info(`[ai-report-specific] test=gad7 source=${aiGeneration.source} cached=${aiGeneration.cached} durationMs=${aiDurationMs}`);
+    if (process.env.NODE_ENV === "production" && aiGeneration.source === "fallback") {
+      console.warn(`[ai-report-specific] fallback used in production for test=gad7: ${aiGeneration.error ?? "unknown"}`);
+    }
 
     return NextResponse.json(
       {
@@ -98,3 +104,4 @@ export async function GET() {
     { status: 200, headers: { "Cache-Control": "no-store" } }
   );
 }
+
